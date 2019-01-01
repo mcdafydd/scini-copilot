@@ -17,7 +17,7 @@ import app from './reducers/app.js';
 const compose = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || origCompose;
 
 export const store = createStore(
-  (state, action) => state,
+  (state, action) => state, /* preloadedState, */
   compose(lazyReducerEnhancer(combineReducers), applyMiddleware(thunk))
 );
 

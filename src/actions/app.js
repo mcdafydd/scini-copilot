@@ -15,6 +15,7 @@ export const UPDATE_DRAWER_STATE = 'UPDATE_DRAWER_STATE';
 export const OPEN_SNACKBAR = 'OPEN_SNACKBAR';
 export const CLOSE_SNACKBAR = 'CLOSE_SNACKBAR';
 export const UPDATE_SUBTITLE = 'UPDATE_SUBTITLE';
+export const UPDATE_CAMERA_MAP = 'UPDATE_CAMERA_MAP';
 
 export const navigate = (location) => (dispatch) => {
   // Extract the page name from path.
@@ -155,3 +156,11 @@ export const updateLocationURL = (url) => (dispatch) => {
   window.history.pushState({}, '', url);
   dispatch(navigate(window.location));
 }
+
+export const updateCameraMap = (cameraMap) => {
+  return {
+    type: UPDATE_CAMERA_MAP,
+    cameraMap
+  }
+}
+

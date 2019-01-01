@@ -1,7 +1,7 @@
 let self = this;
 let canvas, ctx, ws, reopen;
 
-importScripts('src/deps/reconnecting-websocket-iife.min.js');
+importScripts('deps/reconnecting-websocket-iife.min.js');
 
 self.addEventListener('message', function(e) {
   if (e.data.hasOwnProperty('canvas')) {
@@ -47,7 +47,7 @@ self.addEventListener('message', function(e) {
       });
     };
     ws.onerror = function (e) {
-      console.error(`mjpg-streamer websocket error: ${e}`);
+      console.error(`mjpg-streamer websocket error: ${e.error}`);
     };
   }
 }, false);

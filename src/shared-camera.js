@@ -1,5 +1,4 @@
 export function init() {
-  initWorker();
   initListeners();
   initKeyboardControls();
   initMqtt();
@@ -46,14 +45,21 @@ export function initWorker(canvas) {
 
   worker.postMessage({ canvas: offscreen }, [offscreen]);
 
-  this.lastCamera = window.localStorage.getItem('lastCamera');
-  if (this.lastCamera === null ) {
-    this.lastCamera = '215';
+  let lastCamera = window.localStorage.getItem('lastCamera');
+  if (lastCamera === null) {
+    lastCamera = '215';
+  }
+  let cameraMap = window.localStorage.getItem('cameraMap');
+  if (cameraMap === null) {
+    cameraMap = {};
+  }
+  else {
+    cameraMap = JSON.parse(cameraMap);
   }
 
   let port;
-  if (this.cameraMap.hasOwnProperty(this.lastCamera)) {
-    port = this.cameraMap[this.lastCamera].port-100;
+  if (cameraMap.hasOwnProperty(lastCamera)) {
+    port = cameraMap[lastCamera].port-100;
   }
   else {
     port = window.location.port-100;
@@ -79,7 +85,6 @@ export function initListeners() {
     elem.addEventListener('change', () => {
       console.log('Selected camera ', this.value);
       let id = this.value.split('-')[1];
-      console.log(window.localStorage);
       window.localStorage.setItem('lastCamera', id);
       // close old websocket connection
       worker.postMessage({

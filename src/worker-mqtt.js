@@ -3,8 +3,7 @@ let mqttConnected = false;
 let mqttClient;
 let swCh = new BroadcastChannel('swCh');
 
-
-importScripts('src/browserMqtt.js');
+importScripts('deps/browserMqtt.js');
 
 onconnect = function(e) {
   var port = e.ports[0];

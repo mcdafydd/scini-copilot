@@ -1,7 +1,10 @@
+import { store } from "./store";
+import { updateCameraMap } from './actions/app.js';
+
 export function initMqtt(mqttWorker, swCh) {
   mqttWorker.port.start();
   mqttWorker.port.postMessage({hostname: window.location.hostname});
-  swCh.onmessage = function(e) {
+  swCh.onmessage = (e) => {
     if (e.data.hasOwnProperty('log')) {
       console.log(`MQTT SharedWorker sent ${e.data.log}`);
     }
@@ -13,26 +16,42 @@ export function initMqtt(mqttWorker, swCh) {
 
 export function handleMessage(topic, payload) {
   if (topic.match('toCamera/cameraRegistration') !== null) {
+    let cameraMap = window.localStorage.getItem('cameraMap');
     let val = payload.toString().split(':');
     let id = val[1].split('.')[3];  // last IP address octet
-    if (!this.cameraMap.hasOwnProperty(id)) {
-      this.cameraMap[id] = {};
-      this.cameraMap[id].port = val[0];
-      this.cameraMap[id].ts = val[3];
-      this.cameraMap[id].record = val[4];
-      window.localStorage.setItem('cameraMap', JSON.stringify(this.cameraMap));
-    }
-    // make sure it is still valid
-    else {
-      if (this.cameraMap[id].port != val[0]
-          || this.cameraMap[id].ts != val[3]
-          || this.cameraMap[id].record != val[4]) {
-        this.cameraMap[id].port = val[0];
-        this.cameraMap[id].ts = val[3];
-        this.cameraMap[id].record = val[4];
-        window.localStorage.setItem('cameraMap', JSON.stringify(this.cameraMap));
+    if (cameraMap !== null) {
+      cameraMap = JSON.parse(cameraMap);
+      if (cameraMap.hasOwnProperty(id)) {
+        // make sure it is still valid
+        if (cameraMap[id].port != val[0]
+            || cameraMap[id].ts != val[3]
+            || cameraMap[id].record != val[4]) {
+          cameraMap[id].port = val[0];
+          cameraMap[id].ts = val[3];
+          cameraMap[id].record = val[4];
+          window.localStorage.setItem('cameraMap', JSON.stringify(cameraMap));
+        }
       }
+      else {
+        // add camera ID to localStorage
+        cameraMap[id] = {};
+        cameraMap[id].port = val[0];
+        cameraMap[id].ts = val[3];
+        cameraMap[id].record = val[4];
+        window.localStorage.setItem('cameraMap', JSON.stringify(cameraMap));
+      }
+      store.dispatch(updateCameraMap(cameraMap));
     }
+    else {
+      // add camera ID to localStorage
+      cameraMap = {};
+      cameraMap[id] = {};
+      cameraMap[id].port = val[0];
+      cameraMap[id].ts = val[3];
+      cameraMap[id].record = val[4];
+      window.localStorage.setItem('cameraMap', JSON.stringify(cameraMap));
+    }
+
     let statusNode = document.getElementById(`video-${id}-record`);
     if (statusNode) {
       if (this.cameraMap[id].record === "true") {

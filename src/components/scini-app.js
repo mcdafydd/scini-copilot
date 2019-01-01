@@ -27,10 +27,12 @@ import { installOfflineWatcher } from 'pwa-helpers/network.js';
 import { installMediaQueryWatcher } from 'pwa-helpers/media-query.js';
 
 import { store } from '../store.js';
-import { navigate, updateLocationURL, updateOffline, updateLayout, showSnackbar, updateDrawerState } from '../actions/app.js';
+import { navigate, updateLocationURL, updateOffline, updateLayout, showSnackbar, updateDrawerState, updateCameraMap } from '../actions/app.js';
 
 import { initGrid, serializeLayout, saveLayout, loadLayout } from '../shared-grid.js';
 import { initMqtt } from '../shared-mqtt.js';
+
+import { SharedStyles } from './shared-styles.js';
 
 class SciniApp extends connect(store)(LitElement) {
   constructor() {
@@ -42,7 +44,7 @@ class SciniApp extends connect(store)(LitElement) {
     // Setup mqtt SharedWorker
     this.mqttWorker = new SharedWorker('src/worker-mqtt.js');
     this.swCh = new BroadcastChannel('swCh');
-    this.cameraMap = initCameraMap();
+    loadCameraMap();
     initMqtt(this.mqttWorker, this.swCh);
   }
 
@@ -63,6 +65,7 @@ class SciniApp extends connect(store)(LitElement) {
     const backHref = '/' + _lastVisitedListPage;
 
     return html`
+    ${SharedStyles}
     <style>
       :host {
         display: block;
@@ -237,7 +240,9 @@ class SciniApp extends connect(store)(LitElement) {
     </footer>
 
     <snack-bar ?active="${_snackbarOpened}">
-        You are now ${_offline ? 'offline' : 'online'}.</snack-bar>
+      <p>Network: ${_offline ? 'offline' : 'online'}.</p>
+      <p>SCINI ROV: ${_offline ? 'offline' : 'online'}</p>
+      <p>Clump: ${_offline ? 'offline' : 'online'}</p></snack-bar>
     `;
   }
 
@@ -294,14 +299,11 @@ class SciniApp extends connect(store)(LitElement) {
   }
 }
 
-function initCameraMap() {
+function loadCameraMap() {
   let obj = window.localStorage.getItem('cameraMap');
-  let ret;
-  if (obj === null)
-    ret = {};
-  else
-    ret = JSON.parse(obj);
-  return ret;
+  if (obj !== null) {
+    store.dispatch(updateCameraMap(JSON.parse(obj)));
+  }
 }
 
 window.customElements.define('scini-app', SciniApp);
