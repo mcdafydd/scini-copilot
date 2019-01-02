@@ -4,7 +4,7 @@ let img, tex, vloc, tloc, vertexBuff, texBuff, uLoc;
 
 self.canvasHidden = false;
 
-importScripts('reconnecting-websocket-iife.min.js');
+importScripts('deps/reconnecting-websocket-iife.min.js');
 
 // create shaders
 let vertexShaderSrc =

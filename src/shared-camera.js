@@ -11,19 +11,19 @@ export function init() {
 }
 
 export function SilentAudio(audioCtx) {
-  audioCtx = audioCtx || new AudioContext()
-  var source = audioCtx.createConstantSource()
-  var gainNode = audioCtx.createGain()
-  gainNode.gain.value = 0.001 // required to prevent popping on start
-  source.connect(gainNode)
-  gainNode.connect(audioCtx.destination)
-  source.start()
+  audioCtx = audioCtx || new AudioContext();
+  var source = audioCtx.createConstantSource();
+  var gainNode = audioCtx.createGain();
+  gainNode.gain.value = 0.001; // required to prevent popping on start
+  source.connect(gainNode);
+  gainNode.connect(audioCtx.destination);
+  source.start();
 }
 
 export function initWorker(canvas) {
   let workerPath = 'src/worker.js';
   const offscreen = canvas.transferControlToOffscreen();
-  if (document.location.pathname.match('video-gl') !== null) {
+  if (document.location.pathname.match('cameragl') !== null) {
     workerPath = 'src/worker-gl.js';
   }
   let worker = new Worker(workerPath);

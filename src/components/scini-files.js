@@ -10,7 +10,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 import { LitElement, html } from '@polymer/lit-element';
 
-import './scini-image.js';
+import { SharedStyles } from './shared-styles.js';
 
 class SciniFiles extends LitElement {
   constructor() {
@@ -20,6 +20,7 @@ class SciniFiles extends LitElement {
 
   render() {
     return html`
+      ${SharedStyles}
       <iframe src="${this.uri}" frameborder="0"></iframe>
     `;
   }

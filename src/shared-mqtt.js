@@ -16,9 +16,9 @@ export function initMqtt(mqttWorker, swCh) {
 
 export function handleMessage(topic, payload) {
   if (topic.match('toCamera/cameraRegistration') !== null) {
-    let cameraMap = window.localStorage.getItem('cameraMap');
     let val = payload.toString().split(':');
     let id = val[1].split('.')[3];  // last IP address octet
+    let cameraMap = window.localStorage.getItem('cameraMap');
     if (cameraMap !== null) {
       cameraMap = JSON.parse(cameraMap);
       if (cameraMap.hasOwnProperty(id)) {
@@ -49,8 +49,8 @@ export function handleMessage(topic, payload) {
       cameraMap[id].port = val[0];
       cameraMap[id].ts = val[3];
       cameraMap[id].record = val[4];
-      window.localStorage.setItem('cameraMap', JSON.stringify(cameraMap));
     }
+    window.localStorage.setItem('cameraMap', JSON.stringify(cameraMap));
 
     let statusNode = document.getElementById(`video-${id}-record`);
     if (statusNode) {

@@ -10,6 +10,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 import { LitElement, html } from '@polymer/lit-element';
 
+import { SharedStyles } from './shared-styles.js';
+
 class SciniTroubleshooting extends LitElement {
   constructor() {
     super();
@@ -28,6 +30,7 @@ class SciniTroubleshooting extends LitElement {
 
   render() {
     return html`
+      ${SharedStyles}
       <section>
         <h1>Address Tables</h1>
         <div id="data-locations">${this.locTable}</div>

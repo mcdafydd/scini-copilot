@@ -222,6 +222,7 @@ export const SharedStyles = html`
   }
 
   canvas {
+    display: block;
     width: 100%;
     height: 100px;
   }

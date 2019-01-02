@@ -10,9 +10,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 import { html, LitElement } from '@polymer/lit-element';
 
+import { SharedStyles } from './shared-styles.js';
+
 class SciniAbout extends LitElement {
   render() {
     return html`
+    ${SharedStyles}
       <style>
         :host {
           padding: 16px;

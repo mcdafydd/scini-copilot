@@ -9,40 +9,84 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 */
 
 import { LitElement, html } from '@polymer/lit-element';
+import { connect } from 'pwa-helpers/connect-mixin.js';
 
-import './scini-image.js';
+import { store } from '../store.js';
+import { initWorker, initKeyboardControls, sendCamera, SilentAudio } from '../shared-camera.js';
+import { SharedStyles } from './shared-styles.js';
 //import './video-mjpeg.js';
 
-class SciniCameragl extends LitElement {
+class SciniCamera extends connect(store)(LitElement) {
+  constructor() {
+    super();
+    this.cameraMap = {};
+    this.lastCamera = loadLastCamera();
+    this.worker = '';
+  }
+
+  static get properties() {
+    return {
+      cameraMap: { type: Object },
+      lastCamera: { type: String }
+    }
+  }
+
   render() {
     return html`
-      <style>
-        :host {
-          display: block;
-        }
-
-        .books-bg {
-          height: 300px;
-          max-width: 570px;
-          margin: 0 auto;
-        }
-
-        .books-desc {
-          padding: 24px 16px 0;
-          text-align: center;
-        }
-
-        /* Wide Layout */
-        @media (min-width: 648px) {
-          .books-desc {
-            padding: 96px 16px 0;
-          }
-        }
-      </style>
-
-      <scini-image class="books-bg" alt="SCINI Copilot Home" center src="images/books-bg.jpg" placeholder="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAACCAIAAADwyuo0AAAAI0lEQVR4AWPw2v7Wfe1Dj7X3/Pd8YPDf+Uqva79x38GQvW8Bu0sOexptskUAAAAASUVORK5CYII="></scini-image>
+      ${SharedStyles}
+      <select id="video-select" @change="${(e) => this._selectHandler(e, this.cameraMap, this.worker)}">
+        <option disabled><em>Clump</em></option>
+        <option ?selected="${this.lastCamera === '211'}" class="side" value="video-211">Side</option>
+        <option ?selected="${this.lastCamera === '213'}" class="bore" value="video-213">Bore</option>
+        <option disabled>──────────</option>
+        <option disabled><em>ROV</em></option>
+        <option ?selected="${this.lastCamera === '215'}" class="forward" value="video-215">Forward</option>
+        <option ?selected="${this.lastCamera === '217'}" class="up" value="video-217">Up</option>
+        <option ?selected="${this.lastCamera === '218'}" class="down" value="video-218">Down</option>
+      </select>
+      <canvas class="video-canvas" id="cameragl-canvas"><div class="support">Your browser does not support OffscreenCanvas.</div></canvas>
     `;
+  }
+
+  firstUpdated() {
+    // websocket and audio should prevent background throttling
+    SilentAudio();
+    this.worker = initWorker.bind(this)(this.shadowRoot.querySelector('#cameragl-canvas'));
+  }
+
+  stateChanged(state) {
+    this.cameraMap = state.app.cameraMap;
+  }
+
+  _selectHandler(e, cameraMap, worker) {
+    console.log('Selected camera ', e.target.value);
+    let id = e.target.value.split('-')[1];
+    window.localStorage.setItem('lastCamera', id);
+    // inform websocket worker to get new camera stream
+    if (cameraMap.hasOwnProperty(id)) {
+      // close old websocket connection
+      worker.postMessage({
+        command: 'close'
+      });
+      worker.postMessage({
+        hostname: window.location.hostname,
+        wsPort: cameraMap[id].port-100
+      });
+    }
   }
 }
 
-window.customElements.define('scini-cameragl', SciniCameragl);
+function loadLastCamera() {
+  let str = window.localStorage.getItem('lastCamera');
+  let ret;
+  if (str !== null) {
+    ret = str;
+  }
+  else {
+    // set default as forward camera
+    ret = '215';
+  }
+  return ret;
+}
+
+window.customElements.define('scini-cameragl', SciniCamera);

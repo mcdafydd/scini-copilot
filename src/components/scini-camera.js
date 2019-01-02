@@ -12,7 +12,8 @@ import { LitElement, html } from '@polymer/lit-element';
 import { connect } from 'pwa-helpers/connect-mixin.js';
 
 import { store } from '../store.js';
-import { initWorker } from '../shared-camera.js';
+import { initWorker, initKeyboardControls, sendCamera, SilentAudio } from '../shared-camera.js';
+import { SharedStyles } from './shared-styles.js';
 //import './video-mjpeg.js';
 
 class SciniCamera extends connect(store)(LitElement) {
@@ -32,6 +33,7 @@ class SciniCamera extends connect(store)(LitElement) {
 
   render() {
     return html`
+      ${SharedStyles}
       <select id="video-select" @change="${(e) => this._selectHandler(e, this.cameraMap, this.worker)}">
         <option disabled><em>Clump</em></option>
         <option ?selected="${this.lastCamera === '211'}" class="side" value="video-211">Side</option>
@@ -47,6 +49,8 @@ class SciniCamera extends connect(store)(LitElement) {
   }
 
   firstUpdated() {
+    // websocket and audio should prevent background throttling
+    SilentAudio();
     this.worker = initWorker.bind(this)(this.shadowRoot.querySelector('#camera-canvas'));
   }
 

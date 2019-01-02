@@ -13,6 +13,7 @@ import { updateMetadata } from 'pwa-helpers/metadata.js';
 
 import '@polymer/app-layout/app-scroll-effects/effects/waterfall.js';
 import '@polymer/app-layout/app-header/app-header.js';
+import '@polymer/app-layout/app-header-layout/app-header-layout.js';
 import '@polymer/app-layout/app-toolbar/app-toolbar.js';
 import '@polymer/app-layout/app-drawer/app-drawer.js';
 import { setPassiveTouchGestures } from '@polymer/polymer/lib/utils/settings.js';
@@ -31,8 +32,8 @@ import { navigate, updateLocationURL, updateOffline, updateLayout, showSnackbar,
 
 import { initGrid, serializeLayout, saveLayout, loadLayout } from '../shared-grid.js';
 import { initMqtt } from '../shared-mqtt.js';
-
 import { SharedStyles } from './shared-styles.js';
+import './simple-clock.js';
 
 class SciniApp extends connect(store)(LitElement) {
   constructor() {
@@ -84,6 +85,7 @@ class SciniApp extends connect(store)(LitElement) {
 
         color: var(--app-dark-text-color);
 
+        --app-header-text-color: var(--app-primary-color);
         --app-drawer-background-color: var(--app-background-color);
         --app-drawer-text-color: var(--app-dark-text-color);
         --app-drawer-selected-color: var(--app-dark-text-color);
@@ -128,7 +130,7 @@ class SciniApp extends connect(store)(LitElement) {
         padding: 8px;
         box-sizing: border-box;
         background: none;
-        background-color: var(--app-primary-color);;
+        /*background-color: var(--app-primary-color);;*/
         border: none;
         fill: var(--app-header-text-color);
         cursor: pointer;
@@ -191,17 +193,20 @@ class SciniApp extends connect(store)(LitElement) {
     </style>
 
     <!-- Header -->
+    <app-header-layout>
     <app-header condenses reveals effects="waterfall">
       <app-toolbar class="toolbar-top">
         <button class="menu-btn" aria-label="Menu" ?hidden="${hideMenuBtn}"
             @click="${() => store.dispatch(updateDrawerState(true))}">${menuIcon}</button>
         <a class="back-btn" aria-label="Go back" ?hidden="${!hideMenuBtn}" href="${backHref}">${backIcon}</a>
         <div main-title><a href="/">${appTitle}</a></div>
+        <simple-clock></simple-clock>
       </app-toolbar>
       <app-toolbar class="toolbar-bottom" sticky>
       <speech-mic slot="button" continuous interimResults @result="${(e) => this._micResult(e)}"></speech-mic>
       </app-toolbar>
     </app-header>
+    </app-header-layout>
 
     <!-- Drawer content -->
     <app-drawer .opened="${_drawerOpened}"
