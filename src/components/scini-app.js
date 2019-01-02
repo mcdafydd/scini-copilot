@@ -33,6 +33,7 @@ import { navigate, updateLocationURL, updateOffline, updateLayout, showSnackbar,
 import { initGrid, serializeLayout, saveLayout, loadLayout } from '../shared-grid.js';
 import { initMqtt } from '../shared-mqtt.js';
 import { SharedStyles } from './shared-styles.js';
+import './record-status.js';
 import './simple-clock.js';
 
 class SciniApp extends connect(store)(LitElement) {
@@ -122,6 +123,14 @@ class SciniApp extends connect(store)(LitElement) {
         display: inline-block;
       }
 
+      .toolbar-list {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background-color: #333;
+      }
+
       .menu-btn,
       .back-btn {
         display: inline-block;
@@ -200,6 +209,7 @@ class SciniApp extends connect(store)(LitElement) {
             @click="${() => store.dispatch(updateDrawerState(true))}">${menuIcon}</button>
         <a class="back-btn" aria-label="Go back" ?hidden="${!hideMenuBtn}" href="${backHref}">${backIcon}</a>
         <div main-title><a href="/">${appTitle}</a></div>
+        <ul class="toolbar-list"><record-status></record-status></ul>
         <simple-clock></simple-clock>
       </app-toolbar>
       <app-toolbar class="toolbar-bottom" sticky>

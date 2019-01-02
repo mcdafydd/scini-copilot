@@ -106,34 +106,6 @@ export const SharedStyles = html`
     position: absolute;
   }
 
-  nav ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    background-color: #333;
-  }
-
-  nav li {
-    float: left;
-  }
-
-  nav li:last-child {
-    float: right;
-  }
-
-  nav li a {
-    display: block;
-    color: white;
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
-  }
-
-  nav li a:hover:not(.active) {
-    background-color: #111;
-  }
-
   select {
     font-size: 18px;
   }
