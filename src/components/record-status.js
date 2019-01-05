@@ -1,3 +1,21 @@
+/**
+   * `<record-status>` render a dot based on the status attribute and optional tooltip.
+   * ## record-status
+   * Set the status attribute to change dot color as follows:
+   * * "recording" will set color green
+   * * "stopped" will set color red
+   * * "unknown" and default color is yellow
+   *
+   * Add an optional <paper-tooltip> by setting the "id" and "tooltip" attributes
+   * Example usage:
+   * <body>
+   *   <record-status status="recording" id="1" tooltip="info"></record-status>
+   *
+   * @customElement
+   * @polymer
+   *
+   */
+
 import { html, LitElement } from '@polymer/lit-element'
 import '@polymer/paper-tooltip/paper-tooltip.js';
 import { connect } from 'pwa-helpers/connect-mixin.js';
@@ -8,14 +26,14 @@ class RecordStatus extends LitElement {
   constructor() {
     super();
     this.id = '';
-    this.location = '';
+    this.tooltip = '';
     this.status = 'unknown';
   }
 
   static get properties() {
     return {
       id: { type: String },
-      location: { type: String },
+      tooltip: { type: String },
       status: { type: String }
     }
   }
@@ -54,7 +72,7 @@ class RecordStatus extends LitElement {
           background-color: red;
         }
       </style>
-      <div status="${this.status}" class="dot" id="video-${this.id}-record"></div><paper-tooltip for="video-${this.id}-record">${this.location}</paper-tooltip>
+      <div status="${this.status}" class="dot" id="video-${this.id}-record"></div><paper-tooltip for="video-${this.id}-record">${this.tooltip}</paper-tooltip>
     `;
   }
 }

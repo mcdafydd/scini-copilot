@@ -253,11 +253,11 @@ class SciniApp extends connect(store)(LitElement) {
         <a href="/" class="toolbar-top-title">${appTitle}</a>
         <div main-title></div>
         <ul class="toolbar-list">
-          <li><record-status id="211" location="Side"></record-status></li>
-          <li><record-status id="213" location="Bore"></record-status></li>
-          <li><record-status id="215" location="Forward"></record-status></li>
-          <li><record-status id="217" location="Up"></record-status></li>
-          <li><record-status id="218" location="Down"></record-status></li>
+          <li><record-status id="211" tooltip="Side"></record-status></li>
+          <li><record-status id="213" tooltip="Bore"></record-status></li>
+          <li><record-status id="215" tooltip="Forward"></record-status></li>
+          <li><record-status id="217" tooltip="Up"></record-status></li>
+          <li><record-status id="218" tooltip="Down"></record-status></li>
         </ul>
         <simple-clock></simple-clock>
       </app-toolbar>
