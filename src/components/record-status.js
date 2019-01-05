@@ -4,21 +4,19 @@ import { connect } from 'pwa-helpers/connect-mixin.js';
 
 import { store } from '../store.js';
 
-class RecordStatus extends connect(store)(LitElement) {
+class RecordStatus extends LitElement {
   constructor() {
     super();
     this.id = '';
     this.location = '';
-    this.active = false;
-    this.inactive = false;
+    this.status = 'unknown';
   }
 
   static get properties() {
     return {
       id: { type: String },
       location: { type: String },
-      active: { type: Boolean },
-      inactive: { type: Boolean }
+      status: { type: String }
     }
   }
 
@@ -48,31 +46,16 @@ class RecordStatus extends connect(store)(LitElement) {
           border-bottom: 1px dotted black;
         }
 
-        .dot[active] {
+        .dot[status="recording"] {
           background-color: green;
         }
 
-        .dot[inactive] {
+        .dot[status="stopped"] {
           background-color: red;
         }
       </style>
-      <div ?active=${this.active} ?inactive=${this.inactive} class="dot" id="video-${this.id}-record"></div><paper-tooltip for="video-${this.id}-record">${this.location}</paper-tooltip>
+      <div status="${this.status}" class="dot" id="video-${this.id}-record"></div><paper-tooltip for="video-${this.id}-record">${this.location}</paper-tooltip>
     `;
-  }
-
-  stateChanged(state) {
-    if (state.app.hasOwnProperty('cameraMap')) {
-      if (state.app.cameraMap.hasOwnProperty(this.id)) {
-        if (state.app.cameraMap[this.id].record === 'true') {
-          this.active = true;
-          this.inactive = false;
-        }
-        else if (state.app.cameraMap[this.id].record === 'false') {
-          this.active = false;
-          this.inactive = true;
-        }
-      }
-    }
   }
 }
 

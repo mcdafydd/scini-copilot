@@ -45,9 +45,9 @@ class SciniTelemetry extends connect(store)(LitElement) {
           height: 100%;
           width: 100%;
           grid-template-columns: 1fr 1fr 1fr 1fr;
-          grid-template-rows: 2fr 2fr 2fr;
-          grid-column-gap: 14px;
-          grid-row-gap: 14px;
+          grid-template-rows: 2fr 2fr 2fr 2fr 2fr;
+          grid-column-gap: 4px;
+          grid-row-gap: 4px;
           justify-items: stretch;
           align-items: stretch;
         }

@@ -35,7 +35,7 @@ class SciniChart extends connect(store)(LitElement) {
           line-height: 1.5;
         }
 
-        div.smoothie-chart-tooltip {
+        .smoothie-chart-tooltip {
           background: #444;
           padding: 1em;
           margin-top: 20px;
@@ -221,16 +221,15 @@ class SciniChart extends connect(store)(LitElement) {
   }
 
   stateChanged(state) {
+    let ts = new Date().getTime();
     if (state.app.hasOwnProperty('telemetry')) {
-      let ts = new Date().getTime();
-      let obj = state.app.telemetry;
-      for (let prop in obj) {
-        // limit big float precision
-        if (!isNaN(parseFloat(obj[prop]))) {
-          let temp = parseFloat(obj[prop]).toFixed(3);
-          obj[prop] = temp;
+      for (let prop in this.chartProps) {
+        if (prop in state.app.telemetry) {
+          if (!isNaN(parseFloat(state.app.telemetry[prop]))) {
+            let temp = parseFloat(state.app.telemetry[prop]).toFixed(3);
+          }
+          this.appendToChart(ts, prop, temp);
         }
-        this.appendToChart(ts, prop, obj[prop]);
       }
     }
   }

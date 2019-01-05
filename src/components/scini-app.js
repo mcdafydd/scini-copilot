@@ -49,6 +49,18 @@ class SciniApp extends connect(store)(LitElement) {
     initMqtt(this.mqttWorker, this.swCh);
   }
 
+  static get properties() {
+    return {
+      appTitle: { type: String },
+      _page: { type: String },
+      _lastVisitedListPage: { type: Boolean },
+      _offline: { type: Boolean },
+      _wideLayout: { type: Boolean },
+      _drawerOpened: { type: Boolean },
+      _snackbarOpened: { type: Boolean }
+    }
+  }
+
   render() {
     const {
       appTitle,
@@ -298,18 +310,6 @@ class SciniApp extends connect(store)(LitElement) {
     `;
   }
 
-  static get properties() {
-    return {
-      appTitle: { type: String },
-      _page: { type: String },
-      _lastVisitedListPage: { type: Boolean },
-      _offline: { type: Boolean },
-      _wideLayout: { type: Boolean },
-      _drawerOpened: { type: Boolean },
-      _snackbarOpened: { type: Boolean }
-    }
-  }
-
   updated(changedProps) {
     if (changedProps.has('_page')) {
       window.scrollTo(0, 0);
@@ -339,6 +339,19 @@ class SciniApp extends connect(store)(LitElement) {
     this._wideLayout = state.app.wideLayout;
     this._drawerOpened = state.app.drawerOpened;
     this._snackbarOpened = state.app.snackbarOpened;
+    if (state.app.hasOwnProperty('cameraMap')) {
+      let nodes = this.shadowRoot.querySelectorAll('record-status');
+      for (let node in nodes) {
+        if (state.app.cameraMap.hasOwnProperty(node.id)) {
+          if (state.app.cameraMap[node.id].record === 'true') {
+            node.status = 'recording';
+          }
+          else if (state.app.cameraMap[node.id].record === 'false') {
+            node.status = 'stopped';
+          }
+        }
+      }
+    }
   }
 
   _micResult(e) {
