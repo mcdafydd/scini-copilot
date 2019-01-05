@@ -1,22 +1,24 @@
 import { html, LitElement } from '@polymer/lit-element'
+import '@polymer/paper-tooltip/paper-tooltip.js';
+import { connect } from 'pwa-helpers/connect-mixin.js';
 
-class RecordStatus extends LitElement {
+import { store } from '../store.js';
+
+class RecordStatus extends connect(store)(LitElement) {
   constructor() {
     super();
-    this.ip = ['211', '213', '215', '217', '218'];
-    this.location = {
-      '211': 'Side',
-      '213': 'Bore',
-      '215': 'Forward',
-      '217': 'Up',
-      '218': 'Down'
-    };
+    this.id = '';
+    this.location = '';
+    this.active = false;
+    this.inactive = false;
   }
 
   static get properties() {
     return {
-      location: { type: Object },
-      ip: { type: Array }
+      id: { type: String },
+      location: { type: String },
+      active: { type: Boolean },
+      inactive: { type: Boolean }
     }
   }
 
@@ -24,33 +26,53 @@ class RecordStatus extends LitElement {
     return html`
       <style>
         :host {
-          padding: 16px;
+          display: inline-block;
+          padding: 1.5px;
           text-align: center;
           line-height: 1.5;
         }
 
-        li {
-          float: left;
+        paper-tooltip {
+          --paper-tooltip-delay-in: 0;
+          --paper-tooltip-duration-in: 100;
+          --paper-tooltip-duration-out: 0;
+          --paper-tooltip-background: lightskyblue;
         }
 
-        li:last-child {
-          float: right;
+        .dot {
+          height: 25px;
+          width: 25px;
+          background-color: yellow;
+          border-radius: 50%;
+          position: relative;
+          border-bottom: 1px dotted black;
         }
 
-        li a {
-          display: block;
-          color: white;
-          text-align: center;
-          padding: 14px 16px;
-          text-decoration: none;
+        .dot[active] {
+          background-color: green;
         }
 
-        li a:hover:not(.active) {
-          background-color: #111;
+        .dot[inactive] {
+          background-color: red;
         }
       </style>
-      ${this.ip.map(v => html`<li><span class="dot" id="video-${v}-record"><span class="tooltiptext">${this.location[v]}</span></span></li>`)}
+      <div ?active=${this.active} ?inactive=${this.inactive} class="dot" id="video-${this.id}-record"></div><paper-tooltip for="video-${this.id}-record">${this.location}</paper-tooltip>
     `;
+  }
+
+  stateChanged(state) {
+    if (state.app.hasOwnProperty('cameraMap')) {
+      if (state.app.cameraMap.hasOwnProperty(this.id)) {
+        if (state.app.cameraMap[this.id].record === 'true') {
+          this.active = true;
+          this.inactive = false;
+        }
+        else if (state.app.cameraMap[this.id].record === 'false') {
+          this.active = false;
+          this.inactive = true;
+        }
+      }
+    }
   }
 }
 

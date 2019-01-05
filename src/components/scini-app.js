@@ -30,7 +30,6 @@ import { installMediaQueryWatcher } from 'pwa-helpers/media-query.js';
 import { store } from '../store.js';
 import { navigate, updateLocationURL, updateOffline, updateLayout, showSnackbar, updateDrawerState, updateCameraMap } from '../actions/app.js';
 
-import { initGrid, serializeLayout, saveLayout, loadLayout } from '../shared-grid.js';
 import { initMqtt } from '../shared-mqtt.js';
 import { SharedStyles } from './shared-styles.js';
 import './record-status.js';
@@ -106,6 +105,18 @@ class SciniApp extends connect(store)(LitElement) {
         padding: 0 8px 0 8px;
       }
 
+      .toolbar-top-title {
+        font-size: 18px;
+        font-weight: bold;
+        letter-spacing: 0.1em;
+        text-decoration: none;
+        text-transform: uppercase;
+        color: inherit;
+        pointer-events: auto;
+        /* required for IE 11, so this <a> can receive pointer events */
+        display: inline-block;
+      }
+
       .toolbar-bottom {
         justify-content: center;
         background-color: var(--app-background-color);
@@ -128,7 +139,7 @@ class SciniApp extends connect(store)(LitElement) {
         margin: 0;
         padding: 0;
         overflow: hidden;
-        background-color: #333;
+        background-color: #000;
       }
 
       .menu-btn,
@@ -196,6 +207,25 @@ class SciniApp extends connect(store)(LitElement) {
         text-align: center;
       }
 
+      li {
+          float: left;
+        }
+
+        li:last-child {
+          float: right;
+        }
+
+        li a {
+          color: white;
+          text-align: center;
+          padding: 14px 16px;
+          text-decoration: none;
+        }
+
+        li a:hover:not(.active) {
+          background-color: #111;
+        }
+
       [hidden] {
         display: none !important;
       }
@@ -208,8 +238,15 @@ class SciniApp extends connect(store)(LitElement) {
         <button class="menu-btn" aria-label="Menu" ?hidden="${hideMenuBtn}"
             @click="${() => store.dispatch(updateDrawerState(true))}">${menuIcon}</button>
         <a class="back-btn" aria-label="Go back" ?hidden="${!hideMenuBtn}" href="${backHref}">${backIcon}</a>
-        <div main-title><a href="/">${appTitle}</a></div>
-        <ul class="toolbar-list"><record-status></record-status></ul>
+        <a href="/" class="toolbar-top-title">${appTitle}</a>
+        <div main-title></div>
+        <ul class="toolbar-list">
+          <li><record-status id="211" location="Side"></record-status></li>
+          <li><record-status id="213" location="Bore"></record-status></li>
+          <li><record-status id="215" location="Forward"></record-status></li>
+          <li><record-status id="217" location="Up"></record-status></li>
+          <li><record-status id="218" location="Down"></record-status></li>
+        </ul>
         <simple-clock></simple-clock>
       </app-toolbar>
       <app-toolbar class="toolbar-bottom" sticky>

@@ -16,6 +16,7 @@ export const OPEN_SNACKBAR = 'OPEN_SNACKBAR';
 export const CLOSE_SNACKBAR = 'CLOSE_SNACKBAR';
 export const UPDATE_SUBTITLE = 'UPDATE_SUBTITLE';
 export const UPDATE_CAMERA_MAP = 'UPDATE_CAMERA_MAP';
+export const UPDATE_TELEMETRY = 'UPDATE_TELEMETRY';
 
 export const navigate = (location) => (dispatch) => {
   // Extract the page name from path.
@@ -161,6 +162,13 @@ export const updateCameraMap = (cameraMap) => {
   return {
     type: UPDATE_CAMERA_MAP,
     cameraMap
+  }
+}
+
+export const updateTelemetry = (telemetry) => {
+  return {
+    type: UPDATE_TELEMETRY,
+    telemetry
   }
 }
 

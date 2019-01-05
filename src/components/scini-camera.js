@@ -63,15 +63,17 @@ class SciniCamera extends connect(store)(LitElement) {
     let id = e.target.value.split('-')[1];
     window.localStorage.setItem('lastCamera', id);
     // inform websocket worker to get new camera stream
-    if (cameraMap.hasOwnProperty(id)) {
-      // close old websocket connection
-      worker.postMessage({
-        command: 'close'
-      });
-      worker.postMessage({
-        hostname: window.location.hostname,
-        wsPort: cameraMap[id].port-100
-      });
+    if (typeof cameraMap === Object) {
+      if (cameraMap.hasOwnProperty(id)) {
+        // close old websocket connection
+        worker.postMessage({
+          command: 'close'
+        });
+        worker.postMessage({
+          hostname: window.location.hostname,
+          wsPort: cameraMap[id].port-100
+        });
+      }
     }
   }
 }

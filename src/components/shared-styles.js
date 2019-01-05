@@ -13,7 +13,6 @@ import { html } from '@polymer/lit-element';
 export const SharedStyles = html`
 <style>
   :host {
-    display: block;
     box-sizing: border-box;
   }
 
@@ -110,72 +109,6 @@ export const SharedStyles = html`
     font-size: 18px;
   }
 
-  .dot {
-    height: 25px;
-    width: 25px;
-    background-color: yellow;
-    border-radius: 50%;
-    display: inline-block;
-    position: relative;
-    border-bottom: 1px dotted black;
-    /* If you want dots under the hoverable text */
-  }
-
-  .dot .tooltiptext {
-    visibility: hidden;
-    width: 120px;
-    background-color: black;
-    color: #fff;
-    text-align: center;
-    padding: 5px 0;
-    border-radius: 6px;
-    position: absolute;
-    top: -5px;
-    right: 110%;
-    margin-left: -60px;
-  }
-
-  /* Show the tooltip text when you mouse over the tooltip container */
-  .dot:hover .tooltiptext {
-    visibility: visible;
-  }
-
-  /* Tooltip text */
-  .dot .tooltiptext::after {
-    content: " ";
-    position: absolute;
-    top: 50%;
-    left: 100%;
-    margin-top: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: transparent transparent transparent black;
-  }
-
-  .dot-active {
-    background-color: green;
-  }
-
-  .dot-inactive {
-    background-color: red;
-  }
-
-  .dot-current {
-    border: 4px solid rgb(255, 251, 11);
-    background-color: rgb(137, 39, 190);
-  }
-
-  div.smoothie-chart-tooltip {
-    background: #444;
-    padding: 1em;
-    margin-top: 20px;
-    font-family: Consolas, monospace;
-    color: white;
-    font-size: 18px;
-    pointer-events: none;
-    z-index: 4;
-  }
-
   button {
     background-color: #4CAF50;
     /* Green */
@@ -199,10 +132,6 @@ export const SharedStyles = html`
     height: 100px;
   }
 
-  .clock {
-    font-size: 2em;
-  }
-
   .video-canvas {
     width: 100%;
     height: 100%
@@ -215,7 +144,7 @@ export const SharedStyles = html`
   .grid {
     position: relative;
   }
-
+/*
   .item {
     display: block;
     position: absolute;
@@ -225,7 +154,7 @@ export const SharedStyles = html`
     z-index: 1;
     background: #000;
     color: #fff;
-  }
+  }*/
 
   .item.muuri-item-dragging {
     z-index: 3;
@@ -239,12 +168,6 @@ export const SharedStyles = html`
 
   .item.muuri-item-hidden {
     z-index: 0;
-  }
-
-  .item-content {
-    position: relative;
-    width: 100%;
-    height: 100%;
   }
 
   .slider {
@@ -464,18 +387,6 @@ export const SharedStyles = html`
     background-size: 100% 88px;
     background-position: 0% 0%;
     background-image: repeating-linear-gradient(-25deg, #fff, #fff 20px, #df5646 20px, #df5646 40px, #fff 40px, #fff 60px, #1c78a4 60px, #1c78a4 80px);
-  }
-
-  .bottom {
-    position: absolute;
-    bottom: 0px;
-    font-size: 11px;
-  }
-
-  .top {
-    position: absolute;
-    top: 0px;
-    font-size: 11px;
   }
 
   /* device location styling */

@@ -21,6 +21,10 @@ class SimpleClock extends LitElement {
           text-align: center;
           line-height: 1.5;
         }
+
+        .clock {
+          font-size: 2em;
+        }
       </style>
       <div class="clock">${this.time}</div>
     `;

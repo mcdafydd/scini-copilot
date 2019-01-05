@@ -1,5 +1,5 @@
 import { store } from "./store";
-import { updateCameraMap } from './actions/app.js';
+import { updateCameraMap, updateTelemetry } from './actions/app.js';
 
 export function initMqtt(mqttWorker, swCh) {
   mqttWorker.port.start();
@@ -66,6 +66,7 @@ export function handleMessage(topic, payload) {
   }
   else if (topic.match('telemetry/update') !== null) {
     let obj = JSON.parse(payload);
+    store.dispatch(updateTelemetry(obj));
     //console.log(obj);
     let ts = new Date().getTime();
     let updateValues = {};

@@ -9,10 +9,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 */
 
 import { LitElement, html } from '@polymer/lit-element';
+import { connect } from 'pwa-helpers/connect-mixin.js';
 
+import { store } from '../store.js';
 import { SharedStyles } from './shared-styles.js';
 
-class SciniNumbers extends LitElement {
+class SciniNumbers extends connect(store)(LitElement) {
+  constructor() {
+    super();
+  }
+
+  static get properties() {
+    return {
+      value: { type: Number }
+    }
+  }
+
   render() {
     return html`
       ${SharedStyles}
@@ -26,6 +38,13 @@ class SciniNumbers extends LitElement {
         }
       </style>
     `;
+  }
+
+  updateValue(key, value) {
+    let items = document.getElementsByClassName(key);
+    for (let i=0; i<items.length; i++) {
+      items[i].innerHTML = value;
+    }
   }
 }
 
