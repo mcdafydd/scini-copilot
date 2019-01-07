@@ -78,6 +78,17 @@ class SciniTelemetry extends connect(store)(LitElement) {
   }
 
   stateChanged(state) {
+    if (state.app.hasOwnProperty('telemetry')) {
+      let ts = new Date().getTime();
+      for (let prop in this.chartProps) {
+        if (prop in state.app.telemetry) {
+          if (!isNaN(parseFloat(state.app.telemetry[prop]))) {
+            let temp = parseFloat(state.app.telemetry[prop]).toFixed(3);
+          }
+          this.appendToChart(ts, prop, temp);
+        }
+      }
+    }
   }
 }
 

@@ -1,8 +1,26 @@
+/**
+   * `<scini-chart>` render a dot based on the status attribute and optional tooltip.
+   * ## scini-chart
+   * Set the status attribute to change dot color as follows:
+   * * "recording" will set color green
+   * * "stopped" will set color red
+   * * "unknown" and default color is yellow
+   *
+   * Add an optional <paper-tooltip> by setting the "id" and "tooltip" attributes
+   * Example usage:
+   * <body>
+   *   <scini-chart status="recording" id="1" tooltip="info"></scini-chart>
+   *
+   * @customElement
+   * @polymer
+   *
+   */
+
 import { html, LitElement } from '@polymer/lit-element'
 import { connect } from 'pwa-helpers/connect-mixin.js';
 
 import { store } from '../store.js';
-class SciniChart extends connect(store)(LitElement) {
+class SciniChart extends LitElement {
   constructor() {
     super();
     this.chartId = 999;
@@ -218,20 +236,6 @@ class SciniChart extends connect(store)(LitElement) {
       timeline.addTimeSeries(series, options);
     }
     timeline.streamTo(this.shadowRoot.getElementById(chartName), 1000);
-  }
-
-  stateChanged(state) {
-    let ts = new Date().getTime();
-    if (state.app.hasOwnProperty('telemetry')) {
-      for (let prop in this.chartProps) {
-        if (prop in state.app.telemetry) {
-          if (!isNaN(parseFloat(state.app.telemetry[prop]))) {
-            let temp = parseFloat(state.app.telemetry[prop]).toFixed(3);
-          }
-          this.appendToChart(ts, prop, temp);
-        }
-      }
-    }
   }
 }
 

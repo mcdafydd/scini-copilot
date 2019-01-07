@@ -16,13 +16,46 @@ class SciniFiles extends LitElement {
   constructor() {
     super();
     this.uri = 'http://' + window.location.hostname + ':8000';
+    this.hasContent = false;
+  }
+
+  static get properties() {
+    return {
+      hasContent: { type: Boolean }
+    }
   }
 
   render() {
     return html`
       ${SharedStyles}
-      <iframe src="${this.uri}" frameborder="0"></iframe>
+      <style>
+        :host {
+          display: block;
+        }
+
+        div {
+          visibility: hidden;
+        }
+
+        div[has-content] {
+          visibility: visible;
+        }
+      </style>
+      <div ?has-content=${this.hasContent}>
+        <iframe src="${this.uri}" frameborder="0"></iframe>
+      </div>
     `;
+  }
+
+  updated() {
+    let nodeList = this.shadowRoot.querySelectorAll('iframe');
+    if (nodeList[0].childElementCount > 0) {
+      this.hasContent = true;
+    }
+    else {
+      console.log('problem loading iframe');
+      this.hasContent = false;
+    }
   }
 }
 

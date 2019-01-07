@@ -546,6 +546,7 @@
       this.tooltipEl.className = 'smoothie-chart-tooltip';
       this.tooltipEl.style.position = 'absolute';
       this.tooltipEl.style.display = 'none';
+      this.tooltipEl.style.pointerEvents = 'none'; 
       document.body.appendChild(this.tooltipEl);
     }
     return this.tooltipEl;

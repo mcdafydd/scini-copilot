@@ -7,7 +7,15 @@
   "extraDependencies": [
     "manifest.json",
     "node_modules/@webcomponents/webcomponentsjs/**",
-    "push-manifest.json"
+    "push-manifest.json",
+    "src/data.json",
+    "src/worker.js",
+    "src/worker-gl.js",
+    "src/worker-mqtt.js",
+    "src/deps/browserMqtt.js",
+    "src/deps/mousetrap.min.js",
+    "src/deps/reconnecting-websocket-iife.min.js",
+    "src/deps/smoothie.js"
   ],
   "builds": [
     {

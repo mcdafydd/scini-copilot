@@ -142,5 +142,21 @@
       "type": "script",
       "weight": 1
     }
+  },
+  "/visualize": {
+    "src/components/scini-app.js": {
+      "crossorigin": "anonymous",
+      "type": "script",
+      "weight": 1
+    },
+    "src/components/scini-visualize.js": {
+      "crossorigin": "anonymous",
+      "type": "script",
+      "weight": 1
+    },
+    "node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js": {
+      "type": "script",
+      "weight": 1
+    }
   }
 }

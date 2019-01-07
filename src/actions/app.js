@@ -73,6 +73,9 @@ const loadPage = (page) => async (dispatch, getState) => {
     case 'replay':
       module = await import('../components/scini-replay.js');
       break;
+    case 'visualize':
+      module = await import('../components/scini-visualize.js');
+      break;
     case 'about':
       await import('../components/scini-about.js');
       break;

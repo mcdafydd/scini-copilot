@@ -42,6 +42,8 @@ class SciniApp extends connect(store)(LitElement) {
     // See https://www.polymer-project.org/3.0/docs/devguide/settings#setting-passive-touch-gestures
     setPassiveTouchGestures(true);
 
+    // OpenROV URI
+    this.openrovUri = 'http://'+window.location.hostname+':8080';
     // Setup mqtt SharedWorker
     this.mqttWorker = new SharedWorker('src/worker-mqtt.js');
     this.swCh = new BroadcastChannel('swCh');
@@ -278,8 +280,10 @@ class SciniApp extends connect(store)(LitElement) {
         <a ?selected="${_page === 'numbers'}" href="/numbers">Numbers</a>
         <a ?selected="${_page === 'files'}" href="/files">Files</a>
         <a ?selected="${_page === 'troubleshooting'}" href="/troubleshooting">Troubleshooting</a>
+        <a ?selected="${_page === 'openrov'}" href="http://${this.openrovUri}">OpenROV</a>
         <a ?selected="${_page === 'cameragl'}" href="/cameragl">CameraGL</a>
         <a ?selected="${_page === 'replay'}" href="/replay">Replay</a>
+        <a ?selected="${_page === 'visualize'}" href="/visualize">Visualize</a>
         <a ?selected="${_page === 'about'}" href="/about">About</a>
       </nav>
     </app-drawer>
@@ -295,6 +299,7 @@ class SciniApp extends connect(store)(LitElement) {
       <scini-troubleshooting class="_page" ?active="${_page === 'troubleshooting'}"></scini-troubleshooting>
       <scini-cameragl class="_page" ?active="${_page === 'cameragl'}"></scini-cameragl>
       <scini-replay class="_page" ?active="${_page === 'replay'}"></scini-replay>
+      <scini-visualize class="_page" ?active="${_page === 'visualize'}"></scini-visualize>
       <scini-about class="_page" ?active="${_page === 'about'}"></scini-about>
       <scini-404 class="_page" ?active="${_page === '404'}"></scini-404>
     </main>
