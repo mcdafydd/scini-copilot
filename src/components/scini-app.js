@@ -42,8 +42,6 @@ class SciniApp extends connect(store)(LitElement) {
     // See https://www.polymer-project.org/3.0/docs/devguide/settings#setting-passive-touch-gestures
     setPassiveTouchGestures(true);
 
-    // OpenROV URI
-    this.openrovUri = 'http://'+window.location.hostname+':8080';
     // Setup mqtt SharedWorker
     this.mqttWorker = new SharedWorker('src/worker-mqtt.js');
     this.swCh = new BroadcastChannel('swCh');
@@ -273,14 +271,14 @@ class SciniApp extends connect(store)(LitElement) {
     <app-drawer .opened="${_drawerOpened}"
         @opened-changed="${e => store.dispatch(updateDrawerState(e.target.opened))}">
       <nav class="drawer-list" @click="${e => store.dispatch(updateDrawerState(false))}">
-        <a ?selected="${_page === 'camera'}" href="/camera">Home</a>
+        <p></p>
         <a ?selected="${_page === 'camera'}" href="/camera">Camera</a>
         <a ?selected="${_page === 'controls'}" href="/controls">Controls</a>
         <a ?selected="${_page === 'telemetry'}" href="/telemetry">Telemetry</a>
         <a ?selected="${_page === 'numbers'}" href="/numbers">Numbers</a>
         <a ?selected="${_page === 'files'}" href="/files">Files</a>
         <a ?selected="${_page === 'troubleshooting'}" href="/troubleshooting">Troubleshooting</a>
-        <a ?selected="${_page === 'openrov'}" href="http://${this.openrovUri}">OpenROV</a>
+        <a rel="external" href="${window.location.origin}:8080">OpenROV</a>
         <a ?selected="${_page === 'cameragl'}" href="/cameragl">CameraGL</a>
         <a ?selected="${_page === 'replay'}" href="/replay">Replay</a>
         <a ?selected="${_page === 'visualize'}" href="/visualize">Visualize</a>
@@ -359,12 +357,39 @@ class SciniApp extends connect(store)(LitElement) {
     }
   }
 
+  connectedCallback() {
+    super.connectedCallback();
+    this.addEventListener('mqttPublish', (e) => {
+      this.sendMqtt(e);
+    });
+  }
+
+  disconnectedCallback() {
+    this.removeEventListener('mqttPublish');
+  }
+
   _micResult(e) {
     const d = e.detail;
     const value = d.completeTranscript;
     this._input.value = value;
     if (d.isFinal) {
       store.dispatch(updateLocationURL(`/controls?q=${value}`));
+    }
+  }
+
+  sendMqtt(e) {
+    if (e.detail.hasOwnProperty('camera')) {
+      let func = e.detail.camera[0];
+      let port = this.cameraMap[e.detail.camera[1]].port;
+      let value = e.detail.camera[2];
+      let topic = 'toCamera/' + port + '/' + func;
+      try {
+        this.mqttWorker.port.postMessage({topic: topic, payload: value});
+        console.debug('sendMqtt', topic, value);
+      }
+      catch (e) {
+        console.warn(`sendMqtt error: ${e}`)
+      }
     }
   }
 }

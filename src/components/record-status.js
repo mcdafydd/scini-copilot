@@ -53,6 +53,7 @@ class RecordStatus extends LitElement {
           --paper-tooltip-duration-in: 100;
           --paper-tooltip-duration-out: 0;
           --paper-tooltip-background: lightskyblue;
+          --paper-tooltip-text-color: #000000;
         }
 
         .dot {
@@ -72,7 +73,7 @@ class RecordStatus extends LitElement {
           background-color: red;
         }
       </style>
-      <div status="${this.status}" class="dot" id="video-${this.id}-record"></div><paper-tooltip for="video-${this.id}-record">${this.tooltip}</paper-tooltip>
+      <div status="${this.status}" class="dot" id="video-${this.id}-record"></div><paper-tooltip for="video-${this.id}-record"><p>${this.tooltip}</p><p>Recording status:<br>${this.status}</p></paper-tooltip>
     `;
   }
 }
