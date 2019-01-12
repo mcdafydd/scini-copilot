@@ -1,6 +1,6 @@
 {
-  "name": "SCINI Copilot",
-  "short_name": "SCINI Copilot",
+  "name": "SCINI Pilot",
+  "short_name": "SCINI Pilot",
   "description": "Progressive web app to drive the scini-cockpit ROV software",
   "start_url": "/",
   "display": "standalone",

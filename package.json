@@ -1,11 +1,11 @@
 {
-  "name": "scini-copilot",
+  "name": "scini-pilot",
   "version": "0.1.0",
   "contributors": [
     "The Polymer Authors"
   ],
   "license": "BSD-3-Clause",
-  "repository": "PolymerLabs/books",
+  "repository": "mcdafydd/scini-pilot",
   "scripts": {
     "start": "polymer serve",
     "build": "npm run build:prpl-server && npm run build:static",
