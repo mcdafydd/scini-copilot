@@ -12,16 +12,17 @@ import { LitElement, html } from '@polymer/lit-element';
 
 import { SharedStyles } from './shared-styles.js';
 
-class SciniFiles extends LitElement {
+class SciniIframe extends LitElement {
   constructor() {
     super();
-    this.uri = 'http://' + window.location.hostname + ':8000';
-    this.hasContent = false;
+    this.uri = '';
+    this.hasContent = true;
   }
 
   static get properties() {
     return {
-      hasContent: { type: Boolean }
+      hasContent: { type: Boolean },
+      uri: { type: String }
     }
   }
 
@@ -48,15 +49,16 @@ class SciniFiles extends LitElement {
   }
 
   updated() {
+    /*
     let nodeList = this.shadowRoot.querySelectorAll('iframe');
-    if (nodeList[0].childElementCount > 0) {
+    if (nodeList[0].title != "") {
       this.hasContent = true;
     }
     else {
       console.log('problem loading iframe');
       this.hasContent = false;
-    }
+    }*/
   }
 }
 
-window.customElements.define('scini-files', SciniFiles);
+window.customElements.define('scini-iframe', SciniIframe);
