@@ -48,19 +48,6 @@ export const SharedStyles = html`
     }
   }
 
-  .circle {
-    display: block;
-    width: 64px;
-    height: 64px;
-    margin: 0 auto;
-    text-align: center;
-    border-radius: 50%;
-    background: var(--app-primary-color);
-    color: var(--app-light-text-color);
-    font-size: 30px;
-    line-height: 64px;
-  }
-
   .scini-button {
     display: inline-block;
     margin-right: 8px;
@@ -136,14 +123,6 @@ export const SharedStyles = html`
     height: 100%
   }
 
-  .active {
-    background-color: #4CAF50;
-  }
-
-  .grid {
-    position: relative;
-  }
-
   .support {
     display: none;
   }
@@ -155,20 +134,6 @@ export const SharedStyles = html`
     padding: var(--default-padding-half);
     background-color: var(--material-red-500);
     color: white;
-  }
-
-  .ctrl-a {
-    padding: 0.35em 0.35em;
-    text-decoration: none;
-    width: 30%;
-  }
-
-  .ctrl-a:hover {
-    background-color: #555;
-  }
-
-  .ctrl-a:active {
-    background-color: black;
   }
 
   .tg {
@@ -212,25 +177,6 @@ export const SharedStyles = html`
     position: relative;
   }
 
-  /* https://love2dev.com/blog/css-background-stripes/ */
-  .barbershop-pole {
-    margin: 0 auto;
-    background-color: #fff;
-    background-repeat: repeat-y;
-    background-size: 100% 88px;
-    background-position: 0% 0%;
-    background-image: repeating-linear-gradient(-25deg, #fff, #fff 20px, #df5646 20px, #df5646 40px, #fff 40px, #fff 60px, #1c78a4 60px, #1c78a4 80px);
-  }
-
-  .barbershop-pole:hover {
-    margin: 0 auto;
-    background-color: rgb(70, 69, 69);
-    background-repeat: repeat-y;
-    background-size: 100% 88px;
-    background-position: 0% 0%;
-    background-image: repeating-linear-gradient(-25deg, #fff, #fff 20px, #df5646 20px, #df5646 40px, #fff 40px, #fff 60px, #1c78a4 60px, #1c78a4 80px);
-  }
-
   /* device location styling */
   .side {
     background: linear-gradient(rgb(224, 224, 50),lightgoldenrodyellow);
@@ -250,6 +196,10 @@ export const SharedStyles = html`
 
   .up {
     background: linear-gradient(rgb(43, 206, 43), rgb(116, 190, 116));
+  }
+
+  .manip {
+    background: linear-gradient(rgb(224, 209, 209), rgb(117, 112, 112));
   }
 
 </style>
