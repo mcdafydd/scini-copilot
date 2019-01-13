@@ -45,8 +45,10 @@ class SciniApp extends connect(store)(LitElement) {
     // Setup mqtt SharedWorker
     this.mqttWorker = new SharedWorker('src/worker-mqtt.js');
     this.swCh = new BroadcastChannel('swCh');
-    loadCameraMap();
     initMqtt(this.mqttWorker, this.swCh);
+
+    this.cameraMap = {};
+    loadCameraMap();
   }
 
   static get properties() {
@@ -343,6 +345,7 @@ class SciniApp extends connect(store)(LitElement) {
     this._drawerOpened = state.app.drawerOpened;
     this._snackbarOpened = state.app.snackbarOpened;
     if (state.app.hasOwnProperty('cameraMap')) {
+      this.cameraMap = state.app.cameraMap;
       let nodes = this.shadowRoot.querySelectorAll('record-status');
       for (let node in nodes) {
         if (state.app.cameraMap.hasOwnProperty(node.id)) {
@@ -380,7 +383,13 @@ class SciniApp extends connect(store)(LitElement) {
   sendMqtt(e) {
     if (e.detail.hasOwnProperty('camera')) {
       let func = e.detail.camera[0];
-      let port = this.cameraMap[e.detail.camera[1]].port;
+      let port;
+      try {
+        port = this.cameraMap[e.detail.camera[1]].port;
+      }
+      catch(e) {
+        port = 8204;
+      }
       let value = e.detail.camera[2];
       let topic = 'toCamera/' + port + '/' + func;
       try {

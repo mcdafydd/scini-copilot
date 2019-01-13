@@ -81,7 +81,6 @@ export const SharedStyles = html`
     color: #FFF;
   }
 
-  @import "rainbow.css";
   body {
     background-color: #111111;
     color: #eeeeee;
@@ -144,73 +143,6 @@ export const SharedStyles = html`
   .grid {
     position: relative;
   }
-/*
-  .item {
-    display: block;
-    position: absolute;
-    width: 30%;
-    height: 150px;
-    margin: 5px;
-    z-index: 1;
-    background: #000;
-    color: #fff;
-  }*/
-
-  .item.muuri-item-dragging {
-    z-index: 3;
-    background: blue;
-  }
-
-  .item.muuri-item-releasing {
-    z-index: 2;
-    background: blueViolet;
-  }
-
-  .item.muuri-item-hidden {
-    z-index: 0;
-  }
-
-  .slider {
-    -webkit-appearance: none;
-    width: 100%;
-    height: 15px;
-    border-radius: 5px;
-    background: #d3d3d3;
-    outline: none;
-    opacity: 0.7;
-    -webkit-transition: opacity .15s ease-in-out;
-    transition: opacity .15s ease-in-out;
-  }
-
-  .slider:hover {
-    opacity: 1;
-  }
-
-  .slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 25px;
-    height: 25px;
-    border-radius: 50%;
-    background: black;
-    cursor: pointer;
-  }
-
-  .slider::-moz-range-thumb {
-    width: 25px;
-    height: 25px;
-    border: 0;
-    border-radius: 50%;
-    background: black;
-    cursor: pointer;
-  }
-
-  .sliderVal {
-    font-size: 14px;
-    font-weight: bold;
-    color: white;
-    background: black;
-  }
 
   .support {
     display: none;
@@ -223,96 +155,6 @@ export const SharedStyles = html`
     padding: var(--default-padding-half);
     background-color: var(--material-red-500);
     color: white;
-  }
-
-  .tel-item {
-    display: block;
-    position: absolute;
-    width: 100%;
-    height: 160px;
-    margin: 5px;
-    z-index: 1;
-    background: #000;
-    color: #fff;
-  }
-  .tel-item.muuri-item-dragging {
-    z-index: 3;
-    background: blue;
-  }
-  .tel-item.muuri-item-releasing {
-    z-index: 2;
-    background: blueViolet;
-  }
-  .tel-item.muuri-item-hidden {
-    z-index: 0;
-  }
-  .tel-item-content {
-    position: relative;
-    width: 100%;
-    height: 100%;
-  }
-
-  .ctrl-item {
-    display: block;
-    position: absolute;
-    width: 18%;
-    height: 90px;
-    margin: 5px;
-    z-index: 1;
-    background: linear-gradient(rgb(95, 219, 219), rgb(129, 202, 185));
-    color: black;
-  }
-
-  .ctrl-item.muuri-item-dragging {
-    z-index: 3;
-    background: rgb(255, 0, 221);
-  }
-
-  .ctrl-item.muuri-item-releasing {
-    z-index: 2;
-    background: blueViolet;
-  }
-
-  .ctrl-item.muuri-item-hidden {
-    z-index: 0;
-  }
-
-  .ctrl-item-content {
-    position: relative;
-    width: 100%;
-    height: 100%;
-  }
-
-  .ctrl-btn {
-    background: linear-gradient(rgb(117, 112, 112), rgb(224, 209, 209));
-    color: #000000;
-    text-shadow: 0 1px 0 white;
-  }
-
-  .ctrl-btn-sm {
-    border: none;
-    color: white;
-    margin: 0px;
-    padding: 0px 0px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 12px;
-    width: 80%;
-    height: 60%;
-  }
-
-  .ctrl-btn-large {
-    border: none;
-    color: white;
-    margin-bottom: 2px;
-    padding: 5px 16px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 12px;
-    width: 60%;
-    height: 60%;
   }
 
   .ctrl-a {

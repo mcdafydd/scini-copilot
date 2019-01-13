@@ -17,9 +17,7 @@
    */
 
 import { html, LitElement } from '@polymer/lit-element'
-import { connect } from 'pwa-helpers/connect-mixin.js';
 
-import { store } from '../store.js';
 class SciniChart extends LitElement {
   constructor() {
     super();
@@ -68,7 +66,7 @@ class SciniChart extends LitElement {
           height: 100%;
         }
       </style>
-      <div class="item-content" data-id="${this.chartId}">
+      <div data-id="${this.chartId}">
         <h5>${this.chartTitle}</h5>
         <canvas id="${this.chartValueRef}"></canvas>
       </div>
