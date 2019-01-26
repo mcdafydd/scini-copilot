@@ -14,7 +14,6 @@ export const UPDATE_WIDE_LAYOUT = 'UPDATE_WIDE_LAYOUT';
 export const UPDATE_DRAWER_STATE = 'UPDATE_DRAWER_STATE';
 export const OPEN_SNACKBAR = 'OPEN_SNACKBAR';
 export const CLOSE_SNACKBAR = 'CLOSE_SNACKBAR';
-export const UPDATE_SUBTITLE = 'UPDATE_SUBTITLE';
 export const UPDATE_CAMERA_MAP = 'UPDATE_CAMERA_MAP';
 export const UPDATE_TELEMETRY = 'UPDATE_TELEMETRY';
 
@@ -26,8 +25,8 @@ export const navigate = (location) => (dispatch) => {
   const parts = pathname.slice(1).split('/');
   const page = parts[0] || 'home';
   // query is extracted from the search string: /explore?q={query}
-  const match = RegExp('[?&]q=([^&]*)').exec(location.search);
-  const query = match && decodeURIComponent(match[1].replace(/\+/g, ' '))
+  //const match = RegExp('[?&]q=([^&]*)').exec(location.search);
+  //const query = match && decodeURIComponent(match[1].replace(/\+/g, ' '))
 
   dispatch(loadPage(page));
 };
@@ -36,24 +35,13 @@ const loadPage = (page) => async (dispatch, getState) => {
   let module;
   switch(page) {
     case 'home':
+      module = await import('../components/scini-camera.js');
       break;
     case 'camera':
       module = await import('../components/scini-camera.js');
-      // Put code here that you want it to run every time when
-      // navigate to explore page and book-explore.js is loaded.
-      //
-      // In this case, we want to dispatch searchBooks action.
-      // In book-explore.js module it exports searchBooks so we can call the function here.
-      //dispatch(module.searchBooks(query));
       break;
     case 'controls':
       module = await import('../components/scini-controls.js');
-      // Fetch the book info for the given book id.
-      //await dispatch(module.fetchBook(bookId));
-      // Wait for to check if the book id is valid.
-      /*if (isFetchBookFailed(getState().book)) {
-        page = '404';
-      }*/
       break;
     case 'telemetry':
       module = await import('../components/scini-telemetry.js');
@@ -62,25 +50,26 @@ const loadPage = (page) => async (dispatch, getState) => {
       module = await import('../components/scini-numbers.js');
       break;
     case 'files':
-      module = await import('../components/scini-files.js');
+      module = await import('../components/scini-iframe.js');
       break;
     case 'troubleshooting':
       module = await import('../components/scini-troubleshooting.js');
       break;
     case 'cameragl':
-      module = await import('../components/scini-cameragl.js');
+      module = await import('../components/scini-camera.js');
       break;
     case 'replay':
       module = await import('../components/scini-replay.js');
       break;
     case 'visualize':
-      module = await import('../components/scini-visualize.js');
+      module = await import('../components/scini-iframe.js');
       break;
     case 'about':
-      await import('../components/scini-about.js');
+      module = await import('../components/scini-about.js');
       break;
     default:
       // Nothing matches, set page to '404'.
+      module = await import('../components/scini-404.js');
       page = '404';
   }
 
@@ -146,13 +135,6 @@ export const updateDrawerState = (opened) => (dispatch, getState) => {
       type: UPDATE_DRAWER_STATE,
       opened
     });
-  }
-}
-
-export const updateSubTitle = (subTitle) => {
-  return {
-    type: UPDATE_SUBTITLE,
-    subTitle
   }
 }
 

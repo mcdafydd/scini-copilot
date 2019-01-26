@@ -1,9 +1,8 @@
-let self = this;
 let canvas, ctx, ws, reopen;
 
 importScripts('deps/reconnecting-websocket-iife.min.js');
 
-self.addEventListener('message', function(e) {
+this.addEventListener('message', (e) => {
   if (e.data.hasOwnProperty('canvas')) {
     canvas = e.data.canvas;
     ctx = canvas.getContext('2d');
@@ -11,29 +10,32 @@ self.addEventListener('message', function(e) {
   else if (e.data.hasOwnProperty('command')) {
     if (e.data.command === 'close' && ws instanceof ReconnectingWebSocket) {
       // disable handlers and close any open websocket connections
-      ws.onmessage = function () {};
+      ws.onmessage = () => {};
       ws.close();
     }
   }
   else if (e.data.hasOwnProperty('hostname') &&
              e.data.hasOwnProperty('wsPort')) {
 
-    // give user indication of change in camera
-    ctx.beginPath();
-    ctx.rect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = "black";
-    ctx.fill();
     let wsUri = `ws://${e.data.hostname}:${e.data.wsPort}`;
+    console.log(`mjpg-streamer worker reconnecting to ${wsUri}`);
 
     // Ref: https://github.com/pladaria/reconnecting-websocket
     ws = new ReconnectingWebSocket(wsUri);
-    ws.onopen = function () {
+    ws.onopen = () => {
       console.log("mjpg-streamer websocket connected");
+      this.postMessage({'command': 'show'});
+      // give user indication of change in camera
+      // canvas element must be visible to draw on it
+      ctx.beginPath();
+      ctx.rect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "black";
+      ctx.fill();
     };
-    ws.onclose = function () {
+    ws.onclose = () => {
       console.log("mjpg-streamer websocket disconnected");
     };
-    ws.onmessage = function (e) {
+    ws.onmessage = (e) => {
       createImageBitmap(e.data)
       .then(img => {
         if (ctx) {
@@ -46,7 +48,7 @@ self.addEventListener('message', function(e) {
         console.log(`Worker createImageBitmap() error: ${err}`);
       });
     };
-    ws.onerror = function (e) {
+    ws.onerror = (e) => {
       console.error(`mjpg-streamer websocket error: ${e.error}`);
     };
   }

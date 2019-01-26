@@ -8,7 +8,7 @@ Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 */
 
-import { LitElement, html } from '@polymer/lit-element';
+import { LitElement, html } from 'lit-element';
 import { updateMetadata } from 'pwa-helpers/metadata.js';
 
 import '@polymer/app-layout/app-scroll-effects/effects/waterfall.js';
@@ -28,7 +28,7 @@ import { installOfflineWatcher } from 'pwa-helpers/network.js';
 import { installMediaQueryWatcher } from 'pwa-helpers/media-query.js';
 
 import { store } from '../store.js';
-import { navigate, updateLocationURL, updateOffline, updateLayout, showSnackbar, updateDrawerState, updateCameraMap } from '../actions/app.js';
+import { navigate, updateLocationURL, updateOffline, updateLayout, showSnackbar, updateDrawerState } from '../actions/app.js';
 
 import { initMqtt } from '../shared-mqtt.js';
 import { SharedStyles } from './shared-styles.js';
@@ -47,8 +47,11 @@ class SciniApp extends connect(store)(LitElement) {
     this.swCh = new BroadcastChannel('swCh');
     initMqtt(this.mqttWorker, this.swCh);
 
+    // map for mjpeg streams to their properties
     this.cameraMap = {};
-    loadCameraMap();
+
+    this.camPlaying = false;
+    this.glPlaying = false;
   }
 
   static get properties() {
@@ -280,7 +283,7 @@ class SciniApp extends connect(store)(LitElement) {
         <a ?selected="${_page === 'numbers'}" href="/numbers">Numbers</a>
         <a ?selected="${_page === 'files'}" href="/files">Files</a>
         <a ?selected="${_page === 'troubleshooting'}" href="/troubleshooting">Troubleshooting</a>
-        <a rel="external" href="${window.location.origin}:8080">OpenROV</a>
+        <a rel="external" href="http://${window.location.hostname}:8080">OpenROV</a>
         <a ?selected="${_page === 'cameragl'}" href="/cameragl">CameraGL</a>
         <a ?selected="${_page === 'replay'}" href="/replay">Replay</a>
         <a ?selected="${_page === 'visualize'}" href="/visualize">Visualize</a>
@@ -291,15 +294,15 @@ class SciniApp extends connect(store)(LitElement) {
     <!-- Main content -->
     <main role="main" class="main-content">
       <scini-home class="_page" ?active="${_page === 'home'}"></scini-home>
-      <scini-camera class="_page" ?active="${_page === 'camera'}"></scini-camera>
+      <scini-camera class="_page" ?active="${_page === 'camera'}" ?playing="${this.camPlaying === true}"></scini-camera>
       <scini-controls class="_page" ?active="${_page === 'controls'}"></scini-controls>
       <scini-telemetry class="_page" ?active="${_page === 'telemetry'}"></scini-telemetry>
       <scini-numbers class="_page" ?active="${_page === 'numbers'}"></scini-numbers>
-      <scini-files class="_page" ?active="${_page === 'files'}"></scini-files>
+      <scini-iframe class="_page" ?active="${_page === 'files'}" uri="http://${window.location.hostname}:8000"></scini-iframe>
       <scini-troubleshooting class="_page" ?active="${_page === 'troubleshooting'}"></scini-troubleshooting>
-      <scini-cameragl class="_page" ?active="${_page === 'cameragl'}"></scini-cameragl>
+      <scini-camera class="_page" ?active="${_page === 'cameragl'}" ?playing="${this.glPlaying === true}"></scini-camera>
       <scini-replay class="_page" ?active="${_page === 'replay'}"></scini-replay>
-      <scini-visualize class="_page" ?active="${_page === 'visualize'}"></scini-visualize>
+      <scini-iframe class="_page" ?active="${_page === 'visualize'}" uri="http://${window.location.hostname}:5601"></scini-iframe>
       <scini-about class="_page" ?active="${_page === 'about'}"></scini-about>
       <scini-404 class="_page" ?active="${_page === '404'}"></scini-404>
     </main>
@@ -344,6 +347,9 @@ class SciniApp extends connect(store)(LitElement) {
     this._wideLayout = state.app.wideLayout;
     this._drawerOpened = state.app.drawerOpened;
     this._snackbarOpened = state.app.snackbarOpened;
+
+    this.camPlaying = state.app.camPlaying;
+    this.glPlaying = state.app.glPlaying;
     if (state.app.hasOwnProperty('cameraMap')) {
       this.cameraMap = state.app.cameraMap;
       let nodes = this.shadowRoot.querySelectorAll('record-status');
@@ -363,12 +369,21 @@ class SciniApp extends connect(store)(LitElement) {
   connectedCallback() {
     super.connectedCallback();
     this.addEventListener('mqttPublish', (e) => {
-      this.sendMqtt(e);
+      if (e.detail.hasOwnProperty('topic') && e.detail.hasOwnProperty('value')) {
+        this.sendMqtt(e.detail.topic, e.detail.value);
+      }
+      else {
+        console.error(`mqttPublish event fired with invalid properties: ${e.detail}`);
+      }
+    });
+    this.addEventListener('mqttConnected', (e) => {
+      this.initCameras();
     });
   }
 
   disconnectedCallback() {
     this.removeEventListener('mqttPublish');
+    this.removeEventListener('mqttConnected');
   }
 
   _micResult(e) {
@@ -380,33 +395,21 @@ class SciniApp extends connect(store)(LitElement) {
     }
   }
 
-  sendMqtt(e) {
-    if (e.detail.hasOwnProperty('camera')) {
-      let func = e.detail.camera[0];
-      let port;
-      try {
-        port = this.cameraMap[e.detail.camera[1]].port;
-      }
-      catch(e) {
-        port = 8204;
-      }
-      let value = e.detail.camera[2];
-      let topic = 'toCamera/' + port + '/' + func;
-      try {
-        this.mqttWorker.port.postMessage({topic: topic, payload: value});
-        console.debug('sendMqtt', topic, value);
-      }
-      catch (e) {
-        console.warn(`sendMqtt error: ${e}`)
-      }
+  sendMqtt(topic, value) {
+    try {
+      this.mqttWorker.port.postMessage({topic: topic, payload: value});
+      console.debug('sendMqtt', topic, value);
+    }
+    catch (e) {
+      console.warn(`sendMqtt error: ${e}`)
     }
   }
-}
 
-function loadCameraMap() {
-  let obj = window.localStorage.getItem('cameraMap');
-  if (obj !== null) {
-    store.dispatch(updateCameraMap(JSON.parse(obj)));
+  initCameras() {
+    // get list of streamer processes currently online
+    this.sendMqtt('toStreamer/getStatus', '1');
+    // get list of last-known camera properties
+    this.sendMqtt('toCameraConfig/getCameraMap', '1');
   }
 }
 

@@ -16,7 +16,7 @@
    *
    */
 
-import { html, LitElement } from '@polymer/lit-element'
+import { html, LitElement } from 'lit-element'
 import '@polymer/paper-tooltip/paper-tooltip.js';
 import { connect } from 'pwa-helpers/connect-mixin.js';
 

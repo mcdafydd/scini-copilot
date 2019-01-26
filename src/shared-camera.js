@@ -27,76 +27,27 @@ export function initWorker(canvas) {
     workerPath = 'src/worker-gl.js';
   }
   let worker = new Worker(workerPath);
-  worker.onerror = function (e) {
+  worker.onerror = (e) => {
     console.error(`Worker error: ${e}`);
-  }
-  worker.onmessage = function(e) {
-    // hack to support black screen when switching cameras in webGl page
+  };
+  worker.onmessage = (e) => {
     if (e.data.hasOwnProperty('command')) {
       console.log(`Received worker command = ${e.data.command}`);
-      if (e.data.command === 'hide') {
-        canvas.classList.add('support');
-      }
-      else if (e.data.command === 'show') {
-        canvas.classList.remove('support');
+      if (e.data.command === 'show') {
+        canvas.classList.remove('hidden');
       }
     }
-  }
+  };
 
   worker.postMessage({ canvas: offscreen }, [offscreen]);
 
-  let lastCamera = window.localStorage.getItem('lastCamera');
-  if (lastCamera === null) {
-    lastCamera = '215';
-  }
-  let cameraMap = window.localStorage.getItem('cameraMap');
-  if (cameraMap === null) {
-    cameraMap = {};
-  }
-  else {
-    cameraMap = JSON.parse(cameraMap);
-  }
-
-  let port;
-  if (cameraMap.hasOwnProperty(lastCamera)) {
-    port = cameraMap[lastCamera].port-100;
-  }
-  else {
-    port = window.location.port-100;
-  }
-  worker.postMessage({
-    hostname: window.location.hostname,
-    wsPort: port
-  });
-
   // handle window close
-  window.onbeforeunload = function() {
+  window.onbeforeunload = () => {
     worker.postMessage({
       command: 'close'
     });
   };
   return worker;
-}
-
-export function initListeners() {
-  const elem = this.shadowRoot.getElementById('video-select');
-  if (elem !== null) {
-    elem.value = `video-${this.lastCamera}`;
-    elem.addEventListener('change', () => {
-      console.log('Selected camera ', this.value);
-      let id = this.value.split('-')[1];
-      window.localStorage.setItem('lastCamera', id);
-      // close old websocket connection
-      worker.postMessage({
-        command: 'close'
-      });
-      // inform websocket worker to get new camera stream
-      worker.postMessage({
-        hostname: window.location.hostname,
-        wsPort: this.cameraMap[id].port-100
-      });
-    }, false);
-  }
 }
 
 export function initKeyboardControls() {
@@ -139,4 +90,4 @@ export function sendCamera (func, value) {
   let topic = 'toCamera/' + port + '/' + func;
   mqttWorker.port.postMessage({topic: topic, payload: value});
   console.debug('sendCamera', topic, value);
-};
+}

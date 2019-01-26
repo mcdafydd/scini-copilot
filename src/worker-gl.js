@@ -1,8 +1,5 @@
-let self = this;
 let canvas, ctx, ws;
 let img, tex, vloc, tloc, vertexBuff, texBuff, uLoc;
-
-self.canvasHidden = false;
 
 importScripts('deps/reconnecting-websocket-iife.min.js');
 
@@ -39,7 +36,7 @@ function resize(ctx, width, height) {
   ctx.viewport(0, 0, width, height);
 }
 
-self.addEventListener('message', function(e) {
+this.addEventListener('message', (e) => {
   if (e.data.hasOwnProperty('canvas')) {
     canvas = e.data.canvas;
     ctx = canvas.getContext('webgl2', { 'powerPreference': 'high-performance' });
@@ -47,13 +44,8 @@ self.addEventListener('message', function(e) {
   else if (e.data.hasOwnProperty('command')) {
     if (e.data.command === 'close' && ws instanceof ReconnectingWebSocket) {
       // disable handlers and close any open websocket connections
-      ws.onmessage = function () {};
+      ws.onmessage = () => {};
       ws.close();
-      // temporarily hide the canvas in the main context
-      // having trouble just drawing a black background
-      // with ctx.clear() and then getting the websocket stream drawing again
-      self.postMessage({'command': 'hide'});
-      self.canvasHidden = true;
     }
   }
   else if (e.data.hasOwnProperty('hostname') &&
@@ -65,18 +57,18 @@ self.addEventListener('message', function(e) {
     let wsUri = `ws://${e.data.hostname}:${e.data.wsPort}`;
     // Ref: https://github.com/pladaria/reconnecting-websocket
     ws = new ReconnectingWebSocket(wsUri);
-    ws.onopen = function () {
+    ws.onopen = () => {
       console.log("mjpg-streamer websocket connected");
+      // give user indication of change in camera
+      // canvas element must be visible to draw on it
+      this.postMessage({'command': 'show'});
+      //ctx.clearColor(0.0, 0.0, 0.0, 1.0);
+      //ctx.clear(ctx.COLOR_BUFFER_BIT);
     };
-    ws.onclose = function () {
+    ws.onclose = () => {
       console.log("mjpg-streamer websocket disconnected");
     };
-    ws.onmessage = function (e) {
-      if (self.canvasHidden) {
-        // make sure the canvas is visible again
-        self.postMessage({'command': 'show'});
-        self.canvasHidden = false;
-      }
+    ws.onmessage = (e) => {
       createImageBitmap(e.data)
       .then(img => {
         if (ctx) {
@@ -105,7 +97,7 @@ self.addEventListener('message', function(e) {
         console.log(`Worker-gl createImageBitmap() error: ${err}`);
       });
     };
-    ws.onerror = function (e) {
+    ws.onerror = (e) => {
       console.error(`mjpg-streamer websocket error: ${e}`);
     };
   }

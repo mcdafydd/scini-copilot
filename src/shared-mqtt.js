@@ -8,8 +8,18 @@ export function initMqtt(mqttWorker, swCh) {
     if (e.data.hasOwnProperty('log')) {
       console.log(`MQTT SharedWorker sent ${e.data.log}`);
     }
-    else if (e.data.hasOwnProperty('topic') && e.data.hasOwnProperty('payload')) {
+    if (e.data.hasOwnProperty('topic') && e.data.hasOwnProperty('payload')) {
       handleMessage(e.data.topic, e.data.payload);
+    }
+    if (e.data.hasOwnProperty('mqttConnected')) {
+      let obj = { mqttConnected: e.data.mqttConnected };
+      const event = new CustomEvent('mqttConnected', {
+        bubbles: true,
+        composed: true,
+        detail: obj
+      });
+      window.dispatchEvent(event);
+      console.debug('mqttConnected', obj.mqttConnected);
     }
   }
 }
@@ -63,6 +73,18 @@ export function handleMessage(topic, payload) {
         statusNode.classList.add('dot-inactive');
       }
     }
+  }
+  else if (topic.match('fromStreamer/<location>/status') !== null) {
+    let obj = {};
+    let location = topic.split('/')[1];
+    obj[location] = JSON.parse(payload);
+    store.dispatch(updateCameraMap(obj));
+  }
+  else if (topic.match('fromCameraConfig/<location>/status') !== null) {
+    let obj = {};
+    let location = topic.split('/')[1];
+    obj[location] = JSON.parse(payload);
+    store.dispatch(updateCameraMap(obj));
   }
   else if (topic.match('telemetry/update') !== null) {
     let obj = JSON.parse(payload);

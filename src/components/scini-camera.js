@@ -8,7 +8,7 @@ Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 */
 
-import { LitElement, html } from '@polymer/lit-element';
+import { LitElement, html } from 'lit-element';
 import { connect } from 'pwa-helpers/connect-mixin.js';
 
 import { store } from '../store.js';
@@ -21,28 +21,38 @@ class SciniCamera extends connect(store)(LitElement) {
     super();
     this.cameraMap = {};
     this.lastCamera = loadLastCamera();
+    this.needsStream = false;
+    this.playing = false; // attribute
+    this.isPlaying = false; // current state
     this.worker = '';
   }
 
   static get properties() {
     return {
       cameraMap: { type: Object },
-      lastCamera: { type: String }
-    }
+      lastCamera: { type: String },
+      needsStream: { type: Boolean },
+      playing: { type: Boolean }
+    };
   }
 
   render() {
     return html`
       ${SharedStyles}
-      <select id="video-select" @change="${(e) => this._selectHandler(e, this.cameraMap, this.worker)}">
+      <style>
+        .hidden {
+          visibility: hidden;
+        }
+      </style>
+      <select id="video-select" @change="${(e) => this._selectHandler(e)}">
         <option disabled><em>Clump</em></option>
-        <option ?selected="${this.lastCamera === '211'}" class="side" value="video-211">Side</option>
-        <option ?selected="${this.lastCamera === '213'}" class="bore" value="video-213">Bore</option>
+        <option ?selected="${this.lastCamera === 'side'}" class="side" value="video-side">Side</option>
+        <option ?selected="${this.lastCamera === 'bore'}" class="bore" value="video-bore">Bore</option>
         <option disabled>──────────</option>
         <option disabled><em>ROV</em></option>
-        <option ?selected="${this.lastCamera === '215'}" class="forward" value="video-215">Forward</option>
-        <option ?selected="${this.lastCamera === '217'}" class="up" value="video-217">Up</option>
-        <option ?selected="${this.lastCamera === '218'}" class="down" value="video-218">Down</option>
+        <option ?selected="${this.lastCamera === 'forward'}" class="forward" value="video-forward">Forward</option>
+        <option ?selected="${this.lastCamera === 'up'}" class="up" value="video-up">Up</option>
+        <option ?selected="${this.lastCamera === 'down'}" class="down" value="video-down">Down</option>
       </select>
       <canvas class="video-canvas" id="camera-canvas"><div class="support">Your browser does not support OffscreenCanvas.</div></canvas>
     `;
@@ -52,28 +62,65 @@ class SciniCamera extends connect(store)(LitElement) {
     // websocket and audio should prevent background throttling
     SilentAudio();
     this.worker = initWorker.bind(this)(this.shadowRoot.querySelector('#camera-canvas'));
+    this.needsStream = true;
+    let id = loadLastCamera();
+    this.startStream(id);
+  }
+
+  updated() {
+    if (this.isPlaying && !this.playing) {
+      this.isPlaying = false;
+      this.needsStream = false;
+      this.stopStream();
+    }
+    else if (!this.isPlaying && this.playing) {
+      this.isPlaying = true;
+      this.needsStream = true;
+      let id = loadLastCamera();
+      this.startStream(id);
+    }
   }
 
   stateChanged(state) {
     this.cameraMap = state.app.cameraMap;
+    if (this.needsStream === true) {
+      this.startStream(this.lastCamera);
+    }
   }
 
-  _selectHandler(e, cameraMap, worker) {
+  _selectHandler(e) {
     console.log('Selected camera ', e.target.value);
     let id = e.target.value.split('-')[1];
     window.localStorage.setItem('lastCamera', id);
-    // inform websocket worker to get new camera stream
-    if (typeof cameraMap === Object) {
-      if (cameraMap.hasOwnProperty(id)) {
-        // close old websocket connection
-        worker.postMessage({
-          command: 'close'
-        });
-        worker.postMessage({
-          hostname: window.location.hostname,
-          wsPort: cameraMap[id].port-100
-        });
+    this.needsStream = true;
+    this.stopStream();
+    this.startStream(id);
+  }
+
+  stopStream() {
+    let elem = this.shadowRoot.querySelector('#camera-canvas');
+    elem.classList.add('hidden');
+    this.worker.postMessage({
+      command: 'close'
+    });
+  }
+
+  startStream(id) {
+    let port;
+    if (typeof this.cameraMap === 'object') {
+      console.dir(this);
+      if (this.cameraMap.hasOwnProperty(id)) {
+        port = this.cameraMap[id].port;
       }
+    }
+
+    if (!isNaN(port)) {
+      // inform websocket worker to open new camera connection
+      this.worker.postMessage({
+        hostname: window.location.hostname,
+        wsPort: port
+      });
+      this.needsStream = false;
     }
   }
 }
@@ -86,7 +133,7 @@ function loadLastCamera() {
   }
   else {
     // set default as forward camera
-    ret = '215';
+    ret = 'forward';
   }
   return ret;
 }

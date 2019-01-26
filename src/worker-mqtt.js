@@ -1,4 +1,4 @@
-let topicsList = ['telemetry/update', 'toCamera/cameraRegistration'];
+let topicsList = ['telemetry/update', 'toCamera/cameraRegistration', 'fromStreamer/#', 'fromCameraConfig/#'];
 let mqttConnected = false;
 let mqttClient;
 let swCh = new BroadcastChannel('swCh');
@@ -33,15 +33,19 @@ onconnect = function(e) {
               }
             });
           }
+          // let main thread know we're ready to publish
+          swCh.postMessage({mqttConnected: true});
         }
       });
       mqttClient.on('offline', function () {
         mqttConnected = false;
         swCh.postMessage({log: 'MQTT client offline'});
+        swCh.postMessage({mqttConnected: false});
       });
       mqttClient.on('reconnect', function () {
         mqttConnected = true;
         swCh.postMessage({log: 'MQTT client reconnected'});
+        swCh.postMessage({mqttConnected: true});
       });
       mqttClient.on('error', function (err) {
         swCh.postMessage({log: `MQTT client error: ${err}`});

@@ -8,7 +8,7 @@ Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 */
 
-import { UPDATE_PAGE, UPDATE_SUBTITLE, UPDATE_OFFLINE, UPDATE_WIDE_LAYOUT,
+import { UPDATE_PAGE, UPDATE_OFFLINE, UPDATE_WIDE_LAYOUT,
          UPDATE_CAMERA_MAP, OPEN_SNACKBAR, CLOSE_SNACKBAR,
          UPDATE_DRAWER_STATE, UPDATE_TELEMETRY } from '../actions/app.js';
 
@@ -19,12 +19,9 @@ const app = (state = {drawerOpened: false}, action) => {
       return {
         state,
         page: p,
-        lastVisitedListPage: state.lastVisitedListPage
-      };
-    case UPDATE_SUBTITLE:
-      return {
-        ...state,
-        subTitle: action.subTitle
+        lastVisitedListPage: state.lastVisitedListPage,
+        camPlaying: p.match('camera') !== null ? true : false,
+        glPlaying: p.match('gl') !== null ? true : false
       };
     case UPDATE_OFFLINE:
       return {
