@@ -9,7 +9,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 */
 
 import { UPDATE_PAGE, UPDATE_OFFLINE, UPDATE_WIDE_LAYOUT,
-         UPDATE_CAMERA_MAP, OPEN_SNACKBAR, CLOSE_SNACKBAR,
+         UPDATE_CAMERA_CONFIG, UPDATE_STREAMER, OPEN_SNACKBAR, CLOSE_SNACKBAR,
          UPDATE_DRAWER_STATE, UPDATE_TELEMETRY } from '../actions/app.js';
 
 const app = (state = {drawerOpened: false}, action) => {
@@ -17,11 +17,9 @@ const app = (state = {drawerOpened: false}, action) => {
     case UPDATE_PAGE:
       const p = action.page;
       return {
-        state,
+        ...state,
         page: p,
-        lastVisitedListPage: state.lastVisitedListPage,
-        camPlaying: p.match('camera') !== null ? true : false,
-        glPlaying: p.match('gl') !== null ? true : false
+        lastVisitedListPage: state.lastVisitedListPage
       };
     case UPDATE_OFFLINE:
       return {
@@ -38,10 +36,15 @@ const app = (state = {drawerOpened: false}, action) => {
         ...state,
         drawerOpened: action.opened
       };
-    case UPDATE_CAMERA_MAP:
+    case UPDATE_CAMERA_CONFIG:
       return {
         ...state,
-        cameraMap: action.cameraMap
+        cameraConfig: action.cameraConfig
+      };
+    case UPDATE_STREAMER:
+      return {
+        ...state,
+        streamer: action.streamer
       };
     case UPDATE_TELEMETRY:
       return {

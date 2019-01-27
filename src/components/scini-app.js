@@ -48,10 +48,25 @@ class SciniApp extends connect(store)(LitElement) {
     initMqtt(this.mqttWorker, this.swCh);
 
     // map for mjpeg streams to their properties
-    this.cameraMap = {};
+    this.streamer = {};
 
-    this.camPlaying = false;
-    this.glPlaying = false;
+    this.addEventListener('mqttPublish', (e) => {
+      if (e.detail.hasOwnProperty('topic') && e.detail.hasOwnProperty('value')) {
+        this.sendMqtt(e.detail.topic, e.detail.value);
+      }
+      else {
+        console.error(`mqttPublish event fired with invalid properties: ${e.detail}`);
+      }
+    });
+    window.addEventListener('mqttConnected', (e) => {
+      if (e.detail.hasOwnProperty('mqttConnected')) {
+        if (e.detail.mqttConnected === true) {
+          // careful not to run this unless necessary
+          // if broker goes offline, events seem to queue in browser/client
+          this.initCameras();
+        }
+      }
+    });
   }
 
   static get properties() {
@@ -294,13 +309,13 @@ class SciniApp extends connect(store)(LitElement) {
     <!-- Main content -->
     <main role="main" class="main-content">
       <scini-home class="_page" ?active="${_page === 'home'}"></scini-home>
-      <scini-camera class="_page" ?active="${_page === 'camera'}" ?playing="${this.camPlaying === true}"></scini-camera>
+      <scini-camera class="_page" ?active="${_page === 'camera'}"></scini-camera>
       <scini-controls class="_page" ?active="${_page === 'controls'}"></scini-controls>
       <scini-telemetry class="_page" ?active="${_page === 'telemetry'}"></scini-telemetry>
       <scini-numbers class="_page" ?active="${_page === 'numbers'}"></scini-numbers>
       <scini-iframe class="_page" ?active="${_page === 'files'}" uri="http://${window.location.hostname}:8000"></scini-iframe>
       <scini-troubleshooting class="_page" ?active="${_page === 'troubleshooting'}"></scini-troubleshooting>
-      <scini-camera class="_page" ?active="${_page === 'cameragl'}" ?playing="${this.glPlaying === true}"></scini-camera>
+      <scini-camera class="_page" ?active="${_page === 'cameragl'}"></scini-camera>
       <scini-replay class="_page" ?active="${_page === 'replay'}"></scini-replay>
       <scini-iframe class="_page" ?active="${_page === 'visualize'}" uri="http://${window.location.hostname}:5601"></scini-iframe>
       <scini-about class="_page" ?active="${_page === 'about'}"></scini-about>
@@ -348,37 +363,20 @@ class SciniApp extends connect(store)(LitElement) {
     this._drawerOpened = state.app.drawerOpened;
     this._snackbarOpened = state.app.snackbarOpened;
 
-    this.camPlaying = state.app.camPlaying;
-    this.glPlaying = state.app.glPlaying;
-    if (state.app.hasOwnProperty('cameraMap')) {
-      this.cameraMap = state.app.cameraMap;
+    if (state.app.hasOwnProperty('streamer')) {
+      this.streamer = state.app.streamer;
       let nodes = this.shadowRoot.querySelectorAll('record-status');
       for (let node in nodes) {
-        if (state.app.cameraMap.hasOwnProperty(node.id)) {
-          if (state.app.cameraMap[node.id].record === 'true') {
+        if (this.streamer.hasOwnProperty(node.id)) {
+          if (this.streamer[node.id].record === 'true') {
             node.status = 'recording';
           }
-          else if (state.app.cameraMap[node.id].record === 'false') {
+          else if (this.streamer[node.id].record === 'false') {
             node.status = 'stopped';
           }
         }
       }
     }
-  }
-
-  connectedCallback() {
-    super.connectedCallback();
-    this.addEventListener('mqttPublish', (e) => {
-      if (e.detail.hasOwnProperty('topic') && e.detail.hasOwnProperty('value')) {
-        this.sendMqtt(e.detail.topic, e.detail.value);
-      }
-      else {
-        console.error(`mqttPublish event fired with invalid properties: ${e.detail}`);
-      }
-    });
-    this.addEventListener('mqttConnected', (e) => {
-      this.initCameras();
-    });
   }
 
   disconnectedCallback() {
@@ -409,7 +407,7 @@ class SciniApp extends connect(store)(LitElement) {
     // get list of streamer processes currently online
     this.sendMqtt('toStreamer/getStatus', '1');
     // get list of last-known camera properties
-    this.sendMqtt('toCameraConfig/getCameraMap', '1');
+    this.sendMqtt('toCameraConfig/getSettings', '1');
   }
 }
 

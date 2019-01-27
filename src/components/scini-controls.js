@@ -407,7 +407,7 @@ class SciniControls extends LitElement {
     `;
   }
 
-  static _eventHandler(type, func, id, value) {
+  _eventHandler(type, func, id, value) {
     let obj = {};
 
     if (type === 'camera') {

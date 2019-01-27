@@ -19,21 +19,30 @@ import { SharedStyles } from './shared-styles.js';
 class SciniCamera extends connect(store)(LitElement) {
   constructor() {
     super();
-    this.cameraMap = {};
-    this.lastCamera = loadLastCamera();
-    this.needsStream = false;
-    this.playing = false; // attribute
+    this.streamer = {};
+    this.lastCamera = '';
+    this._needsStream = false;
     this.isPlaying = false; // current state
     this.worker = '';
   }
 
   static get properties() {
     return {
-      cameraMap: { type: Object },
+      streamer: { type: Object },
       lastCamera: { type: String },
-      needsStream: { type: Boolean },
-      playing: { type: Boolean }
+      _needsStream: { type: Boolean }
     };
+  }
+
+  get needsStream() {
+    return this._needsStream;
+  }
+
+  set needsStream(val) {
+    this._needsStream = val;
+    if (val === true) {
+      this.startStream();
+    }
   }
 
   render() {
@@ -62,39 +71,26 @@ class SciniCamera extends connect(store)(LitElement) {
     // websocket and audio should prevent background throttling
     SilentAudio();
     this.worker = initWorker.bind(this)(this.shadowRoot.querySelector('#camera-canvas'));
+    this.lastCamera = loadLastCamera();
     this.needsStream = true;
-    let id = loadLastCamera();
-    this.startStream(id);
-  }
-
-  updated() {
-    if (this.isPlaying && !this.playing) {
-      this.isPlaying = false;
-      this.needsStream = false;
-      this.stopStream();
-    }
-    else if (!this.isPlaying && this.playing) {
-      this.isPlaying = true;
-      this.needsStream = true;
-      let id = loadLastCamera();
-      this.startStream(id);
-    }
   }
 
   stateChanged(state) {
-    this.cameraMap = state.app.cameraMap;
-    if (this.needsStream === true) {
-      this.startStream(this.lastCamera);
+    this.streamer = state.app.streamer;
+    if (state.app.page === 'camera' && !this.isPlaying) {
+      this.needsStream = true;
+    }
+    if (state.app.page !== 'camera' && this.isPlaying) {
+      this.stopStream();
     }
   }
 
   _selectHandler(e) {
     console.log('Selected camera ', e.target.value);
-    let id = e.target.value.split('-')[1];
-    window.localStorage.setItem('lastCamera', id);
-    this.needsStream = true;
+    this.lastCamera = e.target.value.split('-')[1];
+    window.localStorage.setItem('lastCamera', this.lastCamera);
     this.stopStream();
-    this.startStream(id);
+    this.needsStream = true;
   }
 
   stopStream() {
@@ -103,24 +99,26 @@ class SciniCamera extends connect(store)(LitElement) {
     this.worker.postMessage({
       command: 'close'
     });
+    this.isPlaying = false;
   }
 
-  startStream(id) {
-    let port;
-    if (typeof this.cameraMap === 'object') {
-      console.dir(this);
-      if (this.cameraMap.hasOwnProperty(id)) {
-        port = this.cameraMap[id].port;
+  // change this to use this.lastCamera always make sure that's current
+  startStream() {
+    let wsPort;
+    if (typeof this.streamer === 'object') {
+      if (this.streamer.hasOwnProperty(this.lastCamera)) {
+        wsPort = this.streamer[this.lastCamera].wsPort;
       }
     }
 
-    if (!isNaN(port)) {
+    if (!isNaN(wsPort)) {
       // inform websocket worker to open new camera connection
       this.worker.postMessage({
         hostname: window.location.hostname,
-        wsPort: port
+        wsPort: wsPort
       });
       this.needsStream = false;
+      this.isPlaying = true;
     }
   }
 }

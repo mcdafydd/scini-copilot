@@ -19,72 +19,18 @@ export function initMqtt(mqttWorker, swCh) {
         detail: obj
       });
       window.dispatchEvent(event);
-      console.debug('mqttConnected', obj.mqttConnected);
     }
   }
 }
 
 export function handleMessage(topic, payload) {
-  if (topic.match('toCamera/cameraRegistration') !== null) {
-    let val = payload.toString().split(':');
-    let id = val[1].split('.')[3];  // last IP address octet
-    let cameraMap = window.localStorage.getItem('cameraMap');
-    if (cameraMap !== null) {
-      cameraMap = JSON.parse(cameraMap);
-      if (cameraMap.hasOwnProperty(id)) {
-        // make sure it is still valid
-        if (cameraMap[id].port != val[0]
-            || cameraMap[id].ts != val[3]
-            || cameraMap[id].record != val[4]) {
-          cameraMap[id].port = val[0];
-          cameraMap[id].ts = val[3];
-          cameraMap[id].record = val[4];
-          window.localStorage.setItem('cameraMap', JSON.stringify(cameraMap));
-        }
-      }
-      else {
-        // add camera ID to localStorage
-        cameraMap[id] = {};
-        cameraMap[id].port = val[0];
-        cameraMap[id].ts = val[3];
-        cameraMap[id].record = val[4];
-        window.localStorage.setItem('cameraMap', JSON.stringify(cameraMap));
-      }
-      store.dispatch(updateCameraMap(cameraMap));
-    }
-    else {
-      // add camera ID to localStorage
-      cameraMap = {};
-      cameraMap[id] = {};
-      cameraMap[id].port = val[0];
-      cameraMap[id].ts = val[3];
-      cameraMap[id].record = val[4];
-    }
-    window.localStorage.setItem('cameraMap', JSON.stringify(cameraMap));
-
-    let statusNode = document.getElementById(`video-${id}-record`);
-    if (statusNode) {
-      if (this.cameraMap[id].record === "true") {
-        statusNode.classList.remove('dot-inactive');
-        statusNode.classList.add('dot-active');
-      }
-      else {
-        statusNode.classList.remove('dot-active');
-        statusNode.classList.add('dot-inactive');
-      }
-    }
-  }
-  else if (topic.match('fromStreamer/<location>/status') !== null) {
-    let obj = {};
+  if (topic.match('fromStreamer/.*/status') !== null) {
     let location = topic.split('/')[1];
-    obj[location] = JSON.parse(payload);
-    store.dispatch(updateCameraMap(obj));
+    store.dispatch(updateCameraMap(location, 'streamer', JSON.parse(payload)));
   }
-  else if (topic.match('fromCameraConfig/<location>/status') !== null) {
-    let obj = {};
+  else if (topic.match('fromCameraConfig/.*/status') !== null) {
     let location = topic.split('/')[1];
-    obj[location] = JSON.parse(payload);
-    store.dispatch(updateCameraMap(obj));
+    store.dispatch(updateCameraMap(location, 'cameraConfig', JSON.parse(payload)));
   }
   else if (topic.match('telemetry/update') !== null) {
     let obj = JSON.parse(payload);

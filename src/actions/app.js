@@ -14,7 +14,8 @@ export const UPDATE_WIDE_LAYOUT = 'UPDATE_WIDE_LAYOUT';
 export const UPDATE_DRAWER_STATE = 'UPDATE_DRAWER_STATE';
 export const OPEN_SNACKBAR = 'OPEN_SNACKBAR';
 export const CLOSE_SNACKBAR = 'CLOSE_SNACKBAR';
-export const UPDATE_CAMERA_MAP = 'UPDATE_CAMERA_MAP';
+export const UPDATE_CAMERA_CONFIG = 'UPDATE_CAMERA_CONFIG';
+export const UPDATE_STREAMER = 'UPDATE_STREAMER';
 export const UPDATE_TELEMETRY = 'UPDATE_TELEMETRY';
 
 export const navigate = (location) => (dispatch) => {
@@ -24,9 +25,6 @@ export const navigate = (location) => (dispatch) => {
   const pathname = location.pathname;
   const parts = pathname.slice(1).split('/');
   const page = parts[0] || 'home';
-  // query is extracted from the search string: /explore?q={query}
-  //const match = RegExp('[?&]q=([^&]*)').exec(location.search);
-  //const query = match && decodeURIComponent(match[1].replace(/\+/g, ' '))
 
   dispatch(loadPage(page));
 };
@@ -143,10 +141,32 @@ export const updateLocationURL = (url) => (dispatch) => {
   dispatch(navigate(window.location));
 }
 
-export const updateCameraMap = (cameraMap) => {
+export const updateCameraMap = (location, key, obj) => (dispatch, getState) => {
+  const state = getState();
+
+  if (!state.app.hasOwnProperty(key)) {
+    state.app[key] = {};
+  }
+  state.app[key][location] = obj;
+  if (key === 'cameraConfig') {
+    dispatch(updateCameraState(state.app[key]));
+  }
+  else if (key === 'streamer') {
+    dispatch(updateStreamerState(state.app[key]));
+  }
+}
+
+const updateCameraState = (cameraConfig) => {
   return {
-    type: UPDATE_CAMERA_MAP,
-    cameraMap
+    type: UPDATE_CAMERA_CONFIG,
+    cameraConfig
+  }
+}
+
+const updateStreamerState = (streamer) => {
+  return {
+    type: UPDATE_STREAMER,
+    streamer
   }
 }
 
