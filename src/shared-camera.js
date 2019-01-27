@@ -34,7 +34,9 @@ export function initWorker(canvas) {
     if (e.data.hasOwnProperty('command')) {
       console.log(`Received worker command = ${e.data.command}`);
       if (e.data.command === 'show') {
-        canvas.classList.remove('hidden');
+        let spinner = this.shadowRoot.querySelector('#camera-canvas-loader');
+        spinner.classList.add('hidden');
+        canvas.classList.remove('hidden'); // remove spinner class
       }
     }
   };

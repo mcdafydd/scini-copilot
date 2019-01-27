@@ -64,6 +64,7 @@ class SciniCamera extends connect(store)(LitElement) {
         <option ?selected="${this.lastCamera === 'down'}" class="down" value="video-down">Down</option>
       </select>
       <canvas class="video-canvas" id="camera-canvas"><div class="support">Your browser does not support OffscreenCanvas.</div></canvas>
+      <div id="camera-canvas-loader" class="lds-ripple hidden"><div></div><div></div></div>
     `;
   }
 
@@ -96,6 +97,8 @@ class SciniCamera extends connect(store)(LitElement) {
   stopStream() {
     let elem = this.shadowRoot.querySelector('#camera-canvas');
     elem.classList.add('hidden');
+    elem = this.shadowRoot.querySelector('#camera-canvas-loader');
+    elem.classList.add('hidden');
     this.worker.postMessage({
       command: 'close'
     });
@@ -104,6 +107,9 @@ class SciniCamera extends connect(store)(LitElement) {
 
   // change this to use this.lastCamera always make sure that's current
   startStream() {
+    // display loading spinner until websocket reconnects
+    let elem = this.shadowRoot.querySelector('#camera-canvas-loader');
+    elem.classList.remove('hidden');
     let wsPort;
     if (typeof this.streamer === 'object') {
       if (this.streamer.hasOwnProperty(this.lastCamera)) {
